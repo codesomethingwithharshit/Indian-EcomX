@@ -1,6 +1,7 @@
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect, useMemo, useCallback } from "react"
 import { useParams, Link, useNavigate } from "react-router-dom"
 import { motion, AnimatePresence } from "framer-motion"
+import { Helmet } from "react-helmet-async"
 import { deliveryInfo } from "../data"
 import { ImageCarousel } from "../components/ImageCarousel"
 import { QuantitySelector } from "../components/QuantitySelector"
@@ -45,6 +46,7 @@ export default function ProductDetails() {
   if (!product) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-28 text-center">
+        <Helmet><title>Product Not Found - Indian EcomX</title></Helmet>
         <h2 className="text-2xl font-bold text-neutral-900 dark:text-white mb-4">Product Not Found</h2>
         <p className="text-neutral-500 mb-6">The product you are looking for does not exist.</p>
         <Link to="/products"><Button>Back to Products</Button></Link>
@@ -52,19 +54,23 @@ export default function ProductDetails() {
     )
   }
 
+  const [imgError, setImgError] = useState(false)
+  const handleImgError = useCallback(() => setImgError(true), [])
+
   const handleAddToCart = () => {
-    addToCart(product, quantity)
+    addToCart({ ...product, selectedSize, selectedColor }, quantity)
     setAddedToCart(true)
     setTimeout(() => setAddedToCart(false), 2000)
   }
 
   const handleBuyNow = () => {
-    addToCart(product, quantity)
+    addToCart({ ...product, selectedSize, selectedColor }, quantity)
     navigate("/checkout")
   }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-10">
+      <Helmet><title>{product.title} - Indian EcomX</title><meta name="description" content={product.description?.slice(0, 160)} /></Helmet>
       <nav className="flex items-center gap-2 text-sm text-neutral-500 dark:text-neutral-400 mb-8 overflow-x-auto pb-2">
         <Link to="/" className="hover:text-neutral-900 dark:hover:text-white transition-colors whitespace-nowrap">Home</Link>
         <span>/</span>
@@ -81,6 +87,13 @@ export default function ProductDetails() {
             className="relative aspect-square rounded-2xl overflow-hidden bg-neutral-100 dark:bg-neutral-800 cursor-zoom-in group mb-4"
             onClick={() => setFullscreen(true)}
           >
+            {imgError ? (
+              <div className="w-full h-full flex items-center justify-center bg-neutral-100 dark:bg-neutral-800">
+                <svg className="w-16 h-16 text-neutral-300 dark:text-neutral-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.41a2.25 2.25 0 013.182 0l2.909 2.91m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                </svg>
+              </div>
+            ) : (
             <AnimatePresence mode="wait">
               <motion.img
                 key={activeImage}
@@ -91,8 +104,10 @@ export default function ProductDetails() {
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.3 }}
                 className="w-full h-full object-cover"
+                onError={handleImgError}
               />
             </AnimatePresence>
+            )}
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors" />
             <div className="absolute bottom-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-lg text-xs text-neutral-600 shadow-sm">
               Click to zoom

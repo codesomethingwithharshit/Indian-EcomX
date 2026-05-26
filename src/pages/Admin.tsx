@@ -1,5 +1,6 @@
 import { useState, useMemo, useRef, useEffect, lazy, Suspense } from "react"
 import { motion } from "framer-motion"
+import { Helmet } from "react-helmet-async"
 import { useProducts } from "../context/ProductContext"
 import { useOrders } from "../context/OrderContext"
 import { useReviews } from "../context/ReviewContext"
@@ -29,7 +30,7 @@ function AdminLogin({ onLogin }) {
     } else setError("Invalid credentials")
   }
   return (
-    <div className="relative min-h-screen">
+    <div className="relative min-h-screen bg-[#08080c] text-white">
       <div className="fixed inset-0 pointer-events-none z-0">
         <div className="absolute top-[-200px] left-[10%] w-[600px] h-[600px] bg-purple-600/15 rounded-full blur-[120px]" />
         <div className="absolute bottom-[-200px] right-[20%] w-[500px] h-[500px] bg-orange-600/10 rounded-full blur-[120px]" />
@@ -323,7 +324,8 @@ export default function Admin() {
   ]
 
   return (
-    <div className="h-full bg-[#08080c] overflow-x-hidden relative" style={{ isolation: 'isolate' }}>
+    <div className="h-full bg-[#08080c] text-white overflow-x-hidden relative" style={{ isolation: 'isolate' }}>
+      <Helmet><title>Admin Panel - Indian EcomX</title><meta name="description" content="Admin panel for managing Indian EcomX store." /></Helmet>
       {/* Ambient glow layers */}
       <div className="fixed inset-0 pointer-events-none z-0" style={{ background: 'radial-gradient(ellipse 80% 50% at 50% -20%, rgba(120,60,255,0.08), transparent), radial-gradient(ellipse 50% 60% at 80% 20%, rgba(255,140,0,0.06), transparent), radial-gradient(ellipse 60% 50% at 20% 80%, rgba(255,140,0,0.04), transparent)' }}>
         <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-purple-600/10 rounded-full blur-[150px]" />

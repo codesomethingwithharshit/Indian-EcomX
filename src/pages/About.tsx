@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
+import { Helmet } from "react-helmet-async"
 import { Link } from "react-router-dom"
 
 const stats = [
@@ -73,6 +74,7 @@ function TimelineAccordion() {
 export default function About() {
   return (
     <div>
+      <Helmet><title>About Us - Indian EcomX</title><meta name="description" content="Learn about Indian EcomX - your trusted online shopping destination. We offer quality products at the best prices." /></Helmet>
       {/* Hero */}
       <section className="relative bg-gradient-to-br from-neutral-900 via-neutral-800 to-neutral-700 text-white overflow-hidden py-20 lg:py-28">
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1200')] bg-cover bg-center opacity-10" />

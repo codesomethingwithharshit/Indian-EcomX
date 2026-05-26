@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation, Link } from "react-router-dom"
+import { HelmetProvider } from "react-helmet-async"
 import { useEffect } from "react"
 import { motion } from "framer-motion"
 import { CartProvider } from "./context/CartContext"
@@ -61,6 +62,7 @@ function NotFound() {
 
 export default function App() {
   return (
+    <HelmetProvider>
     <BrowserRouter>
       <CartProvider>
         <ProductProvider>
@@ -107,5 +109,6 @@ export default function App() {
         </ProductProvider>
       </CartProvider>
     </BrowserRouter>
+    </HelmetProvider>
   )
 }

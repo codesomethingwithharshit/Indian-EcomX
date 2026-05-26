@@ -1,20 +1,32 @@
+import { useState } from "react"
 import { Link } from "react-router-dom"
 import { useCart } from "../context/CartContext"
 import { QuantitySelector } from "./QuantitySelector"
 
 export function CartItem({ item }) {
   const { updateQuantity, removeFromCart } = useCart()
+  const [imgError, setImgError] = useState(false)
 
   return (
     <div className="flex gap-4 py-5 border-b border-neutral-100 dark:border-neutral-800 last:border-b-0">
       <Link to={`/products/${item.id}`} className="flex-shrink-0 w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden bg-neutral-100 dark:bg-neutral-800">
-        <img src={item.images[0]} alt={item.title} className="w-full h-full object-cover" />
+        {imgError ? (
+          <div className="w-full h-full flex items-center justify-center bg-neutral-100 dark:bg-neutral-800">
+            <svg className="w-6 h-6 text-neutral-300 dark:text-neutral-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.41a2.25 2.25 0 013.182 0l2.909 2.91m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+            </svg>
+          </div>
+        ) : (
+          <img src={item.images[0]} alt={item.title} className="w-full h-full object-cover" onError={() => setImgError(true)} />
+        )}
       </Link>
       <div className="flex-1 min-w-0">
         <Link to={`/products/${item.id}`}>
           <h3 className="text-sm font-medium text-neutral-900 dark:text-white truncate hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors">{item.title}</h3>
         </Link>
         <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">{item.category}</p>
+        {item.selectedSize && <p className="text-xs text-neutral-400 dark:text-neutral-500 mt-0.5">Size: {item.selectedSize}</p>}
+        {item.selectedColor && <p className="text-xs text-neutral-400 dark:text-neutral-500">Color: {item.selectedColor}</p>}
         <p className="text-sm font-semibold text-neutral-900 dark:text-white mt-1">₹{item.price.toLocaleString()}</p>
         <div className="flex items-center justify-between mt-3">
           <QuantitySelector quantity={item.quantity} onChange={(q) => updateQuantity(item.id, q)} />

@@ -1,6 +1,7 @@
 import { useState } from "react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { motion, AnimatePresence } from "framer-motion"
+import { Helmet } from "react-helmet-async"
 import { useCart } from "../context/CartContext"
 import { useOrders } from "../context/OrderContext"
 import { Button } from "../components/Button"
@@ -16,6 +17,7 @@ const paymentMethods = [
 ]
 
 export default function Checkout() {
+  const navigate = useNavigate()
   const { cart, clearCart, getCartTotal, getShipping, getTax, getGrandTotal } = useCart()
   const { placeOrder } = useOrders()
   const [form, setForm] = useState({ fullName: "", email: "", phone: "", address: "", city: "", state: "", pincode: "" })
@@ -68,6 +70,7 @@ export default function Checkout() {
       })
       setSubmitted(true)
       clearCart()
+      localStorage.setItem("lastOrderId", JSON.stringify(Date.now()))
       return
     }
 
@@ -89,6 +92,7 @@ export default function Checkout() {
           })
           setSubmitted(true)
           clearCart()
+          localStorage.setItem("lastOrderId", JSON.stringify(Date.now()))
         },
         onFailure: (error) => {
           showToast(`Payment failed: ${error.description || "Please try again"}`, "error")
@@ -104,8 +108,32 @@ export default function Checkout() {
   }
 
   if (cart.length === 0 && !submitted) {
+    const lastId = localStorage.getItem("lastOrderId")
+    if (lastId) {
+      return (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-28 text-center">
+          <Helmet><title>Order Confirmed - Indian EcomX</title><meta name="description" content="Your order was placed successfully!" /></Helmet>
+          <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 200, delay: 0.1 }}>
+            <div className="w-24 h-24 bg-green-100 dark:bg-green-950/40 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg className="w-12 h-12 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+              </svg>
+            </div>
+          </motion.div>
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
+            <h2 className="text-3xl font-bold text-neutral-900 dark:text-white mb-2">Order Placed!</h2>
+            <p className="text-neutral-500 dark:text-neutral-400 text-sm mb-8">Your order #ORD-{lastId} has been placed successfully.</p>
+            <div className="flex gap-4 justify-center">
+              <Link to="/products"><Button variant="primary">Continue Shopping</Button></Link>
+              <Link to="/"><Button variant="secondary">Back to Home</Button></Link>
+            </div>
+          </motion.div>
+        </div>
+      )
+    }
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-28 text-center">
+        <Helmet><title>Shopping Cart - Indian EcomX</title><meta name="description" content="Your cart is empty. Start shopping!" /></Helmet>
         <h2 className="text-2xl font-bold text-neutral-900 dark:text-white mb-2">Your Cart is Empty</h2>
         <p className="text-neutral-500 dark:text-neutral-400 mb-6">Add some items before checking out.</p>
         <Link to="/products"><Button variant="primary">Shop Now</Button></Link>
@@ -116,6 +144,7 @@ export default function Checkout() {
   if (submitted) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-28 text-center">
+        <Helmet><title>Order Confirmed - Indian EcomX</title><meta name="description" content="Your order has been placed successfully!" /></Helmet>
         <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 200, delay: 0.1 }}>
           <div className="w-24 h-24 bg-green-100 dark:bg-green-950/40 rounded-full flex items-center justify-center mx-auto mb-6">
             <motion.svg
@@ -143,6 +172,7 @@ export default function Checkout() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-10">
+      <Helmet><title>Checkout - Indian EcomX</title><meta name="description" content="Complete your purchase at Indian EcomX. Secure checkout with COD, UPI, cards, and net banking." /></Helmet>
       <nav className="flex items-center gap-2 text-sm text-neutral-500 dark:text-neutral-400 mb-8">
         <Link to="/cart" className="hover:text-neutral-900 dark:hover:text-white transition-colors">Cart</Link>
         <span>/</span>

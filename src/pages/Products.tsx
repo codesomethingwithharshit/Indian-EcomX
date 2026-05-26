@@ -1,6 +1,7 @@
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { useSearchParams, Link } from "react-router-dom"
 import { motion, AnimatePresence } from "framer-motion"
+import { Helmet } from "react-helmet-async"
 import { ProductCard } from "../components/ProductCard"
 import { SearchBar } from "../components/SearchBar"
 import { FilterSidebar } from "../components/FilterSidebar"
@@ -18,13 +19,17 @@ export default function Products() {
   const [inStockOnly, setInStockOnly] = useState(false)
   const [sortBy, setSortBy] = useState(searchParams.get("sort") || "")
   const [showFilters, setShowFilters] = useState(false)
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    if (products.length > 0) setLoading(false)
+  }, [products])
 
   const filtered = useMemo(() => {
     let result = [...products]
     if (search) {
       const q = search.toLowerCase()
-      result = result.filter((p) => p.title.toLowerCase().includes(q) || p.category.toLowerCase().includes(q))
+      result = result.filter((p) => p.title.toLowerCase().includes(q) || p.category.toLowerCase().includes(q) || (p.description && p.description.toLowerCase().includes(q)))
     }
     if (selectedCategory) result = result.filter((p) => p.category === selectedCategory)
     if (priceRange) {
@@ -50,6 +55,7 @@ export default function Products() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-10">
+      <Helmet><title>All Products - Indian EcomX</title><meta name="description" content="Browse our full collection of products at Indian EcomX. Shop fashion, electronics, home essentials and more." /></Helmet>
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900 dark:text-white">All Products</h1>

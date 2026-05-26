@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { motion } from "framer-motion"
+import { Helmet } from "react-helmet-async"
 import { useAuth } from "../hooks/useAuth"
 import { showToast } from "../hooks/useToast"
 
@@ -62,6 +63,7 @@ export default function Signup() {
 
   return (
     <div className="min-h-[calc(100vh-5rem)] flex items-center justify-center px-4 py-12 relative overflow-hidden bg-gradient-to-br from-neutral-50 via-white to-neutral-100 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-950">
+      <Helmet><title>Sign Up - Indian EcomX</title><meta name="description" content="Create your Indian EcomX account." /></Helmet>
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -right-40 w-96 h-96 bg-gradient-to-br from-neutral-200/30 to-transparent dark:from-neutral-800/20 rounded-full blur-3xl" />
         <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-gradient-to-tr from-neutral-300/20 to-transparent dark:from-neutral-700/20 rounded-full blur-3xl" />

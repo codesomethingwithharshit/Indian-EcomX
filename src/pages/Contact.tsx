@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
+import { Helmet } from "react-helmet-async"
 import { useOrders } from "../context/OrderContext"
 import { showToast } from "../hooks/useToast"
 
@@ -54,6 +55,7 @@ export default function Contact() {
 
   return (
     <div>
+      <Helmet><title>Contact Us - Indian EcomX</title><meta name="description" content="Get in touch with Indian EcomX." /></Helmet>
       {/* Hero */}
       <section className="relative bg-gradient-to-br from-neutral-900 via-neutral-800 to-neutral-700 text-white overflow-hidden py-20 lg:py-28">
         <div className="absolute top-20 left-20 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl" />

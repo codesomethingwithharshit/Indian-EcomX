@@ -15,10 +15,12 @@ function loadCart() {
 function cartReducer(state, action) {
   switch (action.type) {
     case "ADD_TO_CART": {
-      const existing = state.find((item) => item.id === action.product.id)
+      const existing = state.find(
+        (item) => item.id === action.product.id && item.selectedSize === action.product.selectedSize && item.selectedColor === action.product.selectedColor
+      )
       if (existing) {
         return state.map((item) =>
-          item.id === action.product.id
+          item.id === action.product.id && item.selectedSize === action.product.selectedSize && item.selectedColor === action.product.selectedColor
             ? { ...item, quantity: item.quantity + (action.quantity || 1) }
             : item
         )

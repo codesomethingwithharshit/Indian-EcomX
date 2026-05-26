@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom"
 import { motion } from "framer-motion"
+import { Helmet } from "react-helmet-async"
 import { useCart } from "../context/CartContext"
 import { CartItem } from "../components/CartItem"
 import { CartSummary } from "../components/CartSummary"
@@ -36,6 +37,7 @@ export default function Cart() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-10">
+      <Helmet><title>Shopping Cart - Indian EcomX</title><meta name="description" content="Review your shopping cart at Indian EcomX." /></Helmet>
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900 dark:text-white">Shopping Cart</h1>

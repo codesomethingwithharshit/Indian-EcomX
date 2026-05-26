@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
+import { Helmet } from "react-helmet-async"
 
 const sections = [
   {
@@ -54,6 +55,7 @@ export default function Terms() {
 
   return (
     <div>
+      <Helmet><title>Terms & Conditions - Indian EcomX</title><meta name="description" content="Terms and conditions for using Indian EcomX." /></Helmet>
       {/* Hero */}
       <section className="relative bg-gradient-to-br from-neutral-900 via-neutral-800 to-neutral-700 text-white overflow-hidden py-20 lg:py-28">
         <div className="absolute top-10 right-10 w-72 h-72 bg-amber-500/10 rounded-full blur-3xl" />

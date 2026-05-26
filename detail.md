@@ -284,8 +284,7 @@
 # Environment
 | Variable | Value |
 |---|---|
-| `RAZORPAY_KEY_ID` | `rzp_test_Stfm7CWjU9vfBL` (test mode) |
-| `RAZORPAY_KEY_SECRET` | `mYctfZh4Qt2qAHeUdzF4JR2Z` |
+| `VITE_RAZORPAY_KEY_ID` | `rzp_test_Stfm7CWjU9vfBL` (test mode) |
 
 ---
 

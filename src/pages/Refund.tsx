@@ -1,4 +1,5 @@
 import { motion } from "framer-motion"
+import { Helmet } from "react-helmet-async"
 import { Link } from "react-router-dom"
 
 const sections = [
@@ -43,6 +44,7 @@ const sections = [
 export default function Refund() {
   return (
     <div>
+      <Helmet><title>Refund Policy - Indian EcomX</title><meta name="description" content="Indian EcomX refund and return policy." /></Helmet>
       <section className="bg-gradient-to-br from-neutral-900 via-neutral-800 to-neutral-700 text-white py-20 lg:py-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>

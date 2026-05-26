@@ -1,4 +1,4 @@
-const RAZORPAY_KEY_ID = "rzp_test_Stfm7CWjU9vfBL"
+const RAZORPAY_KEY_ID = import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_test_Stfm7CWjU9vfBL"
 
 export interface RazorpayOptions {
   amount: number

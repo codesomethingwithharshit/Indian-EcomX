@@ -1,6 +1,7 @@
 import { useState, useMemo, useRef } from "react"
 import { Link } from "react-router-dom"
 import { motion } from "framer-motion"
+import { Helmet } from "react-helmet-async"
 import { useTheme } from "../hooks/useTheme"
 import { HeroBanner } from "../components/HeroBanner"
 import { CategoryCard } from "../components/CategoryCard"
@@ -447,6 +448,7 @@ export default function Home() {
 
   return (
     <div>
+      <Helmet><title>Indian EcomX - Premium Online Store</title><meta name="description" content="Shop the latest fashion, electronics, and home essentials at Indian EcomX. Best prices, fast delivery across India." /></Helmet>
       <HeroBanner />
       {visibleSections.map((sec) => {
         if (sec.type === "custom") {
