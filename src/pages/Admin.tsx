@@ -158,6 +158,31 @@ export default function Admin() {
   const [themeForm, setThemeForm] = useState(defaultThemeForm)
   const [editingTheme, setEditingTheme] = useState(null)
   const [showThemeForm, setShowThemeForm] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [collections, setCollections] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("admin-collections") || "[]") } catch { return [] }
+  })
+  const [collectionForm, setCollectionForm] = useState({ name: "", description: "", image: "", productIds: [] })
+  const [editingCollection, setEditingCollection] = useState(null)
+  const [showCollectionForm, setShowCollectionForm] = useState(false)
+
+  const navIcon = (id) => ({
+    dashboard: "M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z",
+    analytics: "M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.25c.621 0 1.125.504 1.125 1.125v10.5c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V9.375c0-.621.504-1.125 1.125-1.125h2.25zM16.5 4.5c.621 0 1.125.504 1.125 1.125v13.5c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V5.625c0-.621.504-1.125 1.125-1.125h2.25z",
+    orders: "M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z",
+    customers: "M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z",
+    products: "M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4",
+    sections: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z",
+    reviews: "M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z",
+    revenue: "M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z",
+    inventory: "M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4",
+    enquiries: "M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75",
+    marketing: "M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z",
+    ai: "M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z",
+    theme: "M4.098 19.902a3.75 3.75 0 005.304 0l6.401-6.402M6.75 21A3.75 3.75 0 013 17.25V4.125C3 3.504 3.504 3 4.125 3h5.25c.621 0 1.125.504 1.125 1.125v4.072M6.75 21a3.75 3.75 0 003.75-3.75V8.197M6.75 21h13.125c.621 0 1.125-.504 1.125-1.125v-5.25c0-.621-.504-1.125-1.125-1.125h-4.072M10.5 8.197l2.88-2.88a1.125 1.125 0 011.59 0l3.712 3.713c.44.44.44 1.152 0 1.59l-2.879 2.88M6.75 8.197l-2.88 2.88",
+    settings: "M10.343 3.94c.09-.542.56-.94 1.11-.94h1.094c.55 0 1.02.398 1.11.94l.149.894c.07.424.395.764.82.854.527.112 1.016.314 1.46.596.213.136.456.173.686.1l.855-.27c.53-.167 1.1.056 1.33.555l.383.852c.23.5.03 1.1-.46 1.346l-.716.36c-.339.17-.543.543-.487.93.068.462.068.938 0 1.4-.056.387.148.76.487.93l.716.36c.49.246.69.847.46 1.346l-.383.852c-.23.5-.8.722-1.33.555l-.855-.27c-.23-.073-.473-.036-.686.1a4.2 4.2 0 01-1.46.596c-.425.09-.75.43-.82.854l-.149.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.02-.398-1.11-.94l-.149-.894c-.07-.424-.395-.764-.82-.854a4.2 4.2 0 01-1.46-.596c-.213-.136-.456-.173-.686-.1l-.855.27c-.53.168-1.1-.056-1.33-.555l-.383-.853c-.23-.5-.03-1.1.46-1.346l.716-.36c-.339-.17-.543-.543.487-.93a3.6 3.6 0 010-1.4c.056-.387-.148-.76-.487-.93l-.716-.36c-.49-.246-.69-.847-.46-1.346l.383-.852c.23-.5.8-.722 1.33-.555l.855.27c.23.073.473.036.686-.1a4.2 4.2 0 011.46-.596c.425-.09.75-.43.82-.854l-.149-.894z",
+  }[id] || "M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4")
+
   const [socialLinksConfig, setSocialLinksConfig] = useState(() => {
     try { return JSON.parse(localStorage.getItem("admin-social-links") || "[]") } catch { return [] }
   })
@@ -165,16 +190,37 @@ export default function Admin() {
   const [editingSocial, setEditingSocial] = useState(null)
   const [showSocialForm, setShowSocialForm] = useState(false)
 
-  if (!authenticated) return <AdminLogin onLogin={() => setAuthenticated(true)} />
-
+  const subscribersCount = useMemo(() => {
+    try { return JSON.parse(localStorage.getItem("admin-subscribers") || "[]").length } catch { return 0 }
+  }, [])
   const stats = useMemo(() => [
     { label: "Total Products", value: products.length },
     { label: "Orders", value: orders.length },
     { label: "Enquiries", value: enquiries.length },
     { label: "Reviews", value: reviews.length },
-  ], [products, orders, enquiries, reviews])
+    { label: "Subscribers", value: subscribersCount },
+  ], [products, orders, enquiries, reviews, subscribersCount])
 
   const filtered = useMemo(() => products.filter((p) => p.title.toLowerCase().includes(search.toLowerCase())), [products, search])
+
+  useEffect(() => {
+    const existing = document.getElementById("admin-custom-theme-style")
+    if (existing) existing.remove()
+    if (!activeCustomTheme) return
+    const theme = savedThemes.find((t) => t.id === activeCustomTheme)
+    if (!theme || !theme.css) return
+    const currentTheme = document.documentElement.getAttribute("data-theme") || "latest"
+    const style = document.createElement("style")
+    style.id = "admin-custom-theme-style"
+    style.textContent = `[data-theme="${currentTheme}"] { ${theme.css} }`
+    document.head.appendChild(style)
+    return () => {
+      const s = document.getElementById("admin-custom-theme-style")
+      if (s) s.remove()
+    }
+  }, [activeCustomTheme, savedThemes])
+
+  if (!authenticated) return <AdminLogin onLogin={() => setAuthenticated(true)} />
 
   const handleAdd = () => { setEditingProduct(null); setModalOpen(true) }
   const handleEdit = (product) => { setEditingProduct(product); setModalOpen(true) }
@@ -222,23 +268,6 @@ export default function Admin() {
     })))
   }
 
-  useEffect(() => {
-    const existing = document.getElementById("admin-custom-theme-style")
-    if (existing) existing.remove()
-    if (!activeCustomTheme) return
-    const theme = savedThemes.find((t) => t.id === activeCustomTheme)
-    if (!theme || !theme.css) return
-    const currentTheme = document.documentElement.getAttribute("data-theme") || "latest"
-    const style = document.createElement("style")
-    style.id = "admin-custom-theme-style"
-    style.textContent = `[data-theme="${currentTheme}"] { ${theme.css} }`
-    document.head.appendChild(style)
-    return () => {
-      const s = document.getElementById("admin-custom-theme-style")
-      if (s) s.remove()
-    }
-  }, [activeCustomTheme, savedThemes])
-
   const saveTheme = (form, oldId) => {
     const h = parseInt(form.accentH) || 190
     const s = form.accentS || "100%"
@@ -282,6 +311,7 @@ export default function Admin() {
     { id: "customers", label: "Customers" },
     { id: "products", label: "Products", count: products.length },
     { id: "sections", label: "Sections", count: sections.length },
+    { id: "collections", label: "Collections", count: collections.length },
     { id: "reviews", label: "Reviews", count: reviews.length },
     { id: "revenue", label: "Revenue" },
     { id: "inventory", label: "Inventory" },
@@ -293,85 +323,100 @@ export default function Admin() {
   ]
 
   return (
-    <div className="flex flex-col h-screen bg-[#08080c] overflow-hidden relative">
-      {/* Ambient glows */}
-      <div className="fixed inset-0 pointer-events-none z-0">
-        <div className="absolute top-[-250px] left-[5%] w-[700px] h-[700px] bg-purple-600/12 rounded-full blur-[150px]" />
-        <div className="absolute bottom-[-200px] right-[15%] w-[500px] h-[500px] bg-orange-600/8 rounded-full blur-[120px]" />
+    <div className="h-full bg-[#08080c] overflow-x-hidden relative" style={{ isolation: 'isolate' }}>
+      {/* Ambient glow layers */}
+      <div className="fixed inset-0 pointer-events-none z-0" style={{ background: 'radial-gradient(ellipse 80% 50% at 50% -20%, rgba(120,60,255,0.08), transparent), radial-gradient(ellipse 50% 60% at 80% 20%, rgba(255,140,0,0.06), transparent), radial-gradient(ellipse 60% 50% at 20% 80%, rgba(255,140,0,0.04), transparent)' }}>
+        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-purple-600/10 rounded-full blur-[150px]" />
+        <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-orange-600/8 rounded-full blur-[120px]" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-purple-500/4 rounded-full blur-[200px]" />
       </div>
+      <div className="fixed inset-0 z-[1] pointer-events-none opacity-[0.03]" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'n\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.85\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23n)\'/%3E%3C/svg%3E")' }} />
 
-      {/* Top Navigation Bar */}
-      <div className="flex-shrink-0 relative z-20 bg-[#0c0c10] border-b border-white/[0.06]">
-        <div className="flex items-center h-14 px-4 sm:px-6 gap-3 border-b border-white/[0.04]">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-amber-600/20">
-            <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 1.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.75c0 .415.336.75.75.75z" />
-            </svg>
-          </div>
-          <div className="hidden sm:block">
-            <span className="text-sm font-bold text-white">Urban Edge</span>
-            <p className="text-[10px] text-white/30 tracking-wider uppercase leading-tight">Admin Panel</p>
-          </div>
-          <div className="flex-1" />
-          <button onClick={() => { setAuthenticated(false); sessionStorage.removeItem("admin-authenticated") }}
-            className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-white/40 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-all">
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
-            </svg>
-            Sign Out
-          </button>
-        </div>
-        <nav className="flex items-center gap-0.5 px-3 sm:px-4 py-2 overflow-x-auto scrollbar-none">
-          {tabs.map((t) => (
-            <button key={t.id} onClick={() => setTab(t.id)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-all whitespace-nowrap ${
-                tab === t.id
-                  ? "bg-gradient-to-r from-purple-500/15 to-orange-500/15 text-white border border-white/[0.06] shadow-sm"
-                  : "text-white/40 hover:text-white/70 hover:bg-white/[0.03]"
-              }`}>
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d={{
-                  dashboard: "M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z",
-                  analytics: "M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.25c.621 0 1.125.504 1.125 1.125v10.5c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V9.375c0-.621.504-1.125 1.125-1.125h2.25zM16.5 4.5c.621 0 1.125.504 1.125 1.125v13.5c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V5.625c0-.621.504-1.125 1.125-1.125h2.25z",
-                  orders: "M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z",
-                  customers: "M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z",
-                  products: "M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4",
-                  sections: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z",
-                  reviews: "M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z",
-                  revenue: "M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z",
-                  inventory: "M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4",
-                  enquiries: "M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75",
-                  marketing: "M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z",
-                  ai: "M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z",
-                  theme: "M4.098 19.902a3.75 3.75 0 005.304 0l6.401-6.402M6.75 21A3.75 3.75 0 013 17.25V4.125C3 3.504 3.504 3 4.125 3h5.25c.621 0 1.125.504 1.125 1.125v4.072M6.75 21a3.75 3.75 0 003.75-3.75V8.197M6.75 21h13.125c.621 0 1.125-.504 1.125-1.125v-5.25c0-.621-.504-1.125-1.125-1.125h-4.072M10.5 8.197l2.88-2.88a1.125 1.125 0 011.59 0l3.712 3.713c.44.44.44 1.152 0 1.59l-2.879 2.88M6.75 8.197l-2.88 2.88",
-                  settings: "M10.343 3.94c.09-.542.56-.94 1.11-.94h1.094c.55 0 1.02.398 1.11.94l.149.894c.07.424.395.764.82.854.527.112 1.016.314 1.46.596.213.136.456.173.686.1l.855-.27c.53-.167 1.1.056 1.33.555l.383.852c.23.5.03 1.1-.46 1.346l-.716.36c-.339.17-.543.543-.487.93.068.462.068.938 0 1.4-.056.387.148.76.487.93l.716.36c.49.246.69.847.46 1.346l-.383.852c-.23.5-.8.722-1.33.555l-.855-.27c-.23-.073-.473-.036-.686.1a4.2 4.2 0 01-1.46.596c-.425.09-.75.43-.82.854l-.149.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.02-.398-1.11-.94l-.149-.894c-.07-.424-.395-.764-.82-.854a4.2 4.2 0 01-1.46-.596c-.213-.136-.456-.173-.686-.1l-.855.27c-.53.168-1.1-.056-1.33-.555l-.383-.853c-.23-.5-.03-1.1.46-1.346l.716-.36c.339-.17.543-.543.487-.93a3.6 3.6 0 010-1.4c.056-.387-.148-.76-.487-.93l-.716-.36c-.49-.246-.69-.847-.46-1.346l.383-.852c.23-.5.8-.722 1.33-.555l.855.27c.23.073.473.036.686-.1a4.2 4.2 0 011.46-.596c.425-.09.75-.43.82-.854l.149-.894z",
-                }[t.id] || "M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"} />
+      <div className="flex h-screen relative z-10">
+        {/* Mobile overlay - inside stacking context so sidebar (z-30) stacks above it */}
+        {sidebarOpen && <div className="fixed inset-0 bg-black/60 lg:hidden z-20" onClick={() => setSidebarOpen(false)} />}
+
+        {/* ====== Sidebar ====== */}
+        <aside className={`fixed lg:relative inset-y-0 left-0 z-30 flex flex-col w-56 bg-[#0a0a0e]/98 backdrop-blur-2xl border-r border-white/[0.06] transition-transform duration-300 ease-out ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}>
+
+          {/* Logo */}
+          <div className="flex items-center h-12 px-3 border-b border-white/[0.05] flex-shrink-0">
+            <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center flex-shrink-0 ring-1 ring-white/10 shadow-lg shadow-amber-600/20">
+              <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 1.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.75c0 .415.336.75.75.75z" />
               </svg>
-              <span>{t.label}</span>
-              {t.count !== undefined && (
-                <span className={`ml-0.5 text-[10px] font-medium px-1.5 py-0.5 rounded-full ${
-                  tab === t.id ? "bg-white/[0.12] text-white/80" : "bg-white/[0.04] text-white/40"
-                }`}>{t.count}</span>
-              )}
-            </button>
-          ))}
-        </nav>
-      </div>
+            </div>
+            <span className="ml-2 text-sm font-bold text-white/90 tracking-tight">Urban Edge</span>
+          </div>
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0 relative z-10">
-        {/* Top Bar */}
-        <header className="h-14 flex-shrink-0 flex items-center justify-between px-4 sm:px-6 border-b border-white/[0.06] bg-white/[0.02] backdrop-blur-xl">
+          {/* Nav Items */}
+          <nav className="flex-1 overflow-y-auto py-2 px-1.5 space-y-0.5 scrollbar-thin">
+            {tabs.map((t) => (
+              <button key={t.id} onClick={() => { setTab(t.id); setSidebarOpen(false) }}
+                className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-150 ${
+                  tab === t.id
+                    ? "text-white bg-gradient-to-r from-purple-500/12 to-orange-500/8 border border-white/[0.06] shadow-sm"
+                    : "text-white/40 hover:text-white/70 hover:bg-white/[0.03] border border-transparent"
+                }`}>
+                <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d={navIcon(t.id)} />
+                </svg>
+                <span className="truncate">{t.label}</span>
+                {t.count !== undefined && (
+                  <span className={`ml-auto text-[10px] font-semibold px-1.5 py-0.5 rounded-md leading-none ${
+                    tab === t.id ? "bg-white/[0.12] text-white/90" : "bg-white/[0.05] text-white/40"
+                  }`}>{t.count}</span>
+                )}
+              </button>
+            ))}
+          </nav>
+
+          {/* Bottom: Theme pills + Sign out */}
+          <div className="px-2 py-2 border-t border-white/[0.05] space-y-1.5">
+            <div className="flex items-center gap-1">
+              {[{id:"premium",label:"Premium",grad:"from-amber-500/20 to-orange-500/20",border:"border-amber-500/30",txt:"text-amber-400",dot:"bg-amber-400"},{id:"latest",label:"Latest",grad:"from-cyan-500/20 to-blue-500/20",border:"border-cyan-500/30",txt:"text-cyan-400",dot:"bg-cyan-400"},{id:"custom",label:"Custom",grad:"from-purple-500/20 to-violet-500/20",border:"border-purple-500/30",txt:"text-purple-400",dot:"bg-purple-400"}].map((t) => (
+                <button key={t.id} onClick={() => switchVisualTheme(t.id)}
+                  className={`flex-1 flex items-center justify-center gap-1 px-1.5 py-1 rounded-lg text-[9px] font-semibold uppercase tracking-wider transition-all border ${
+                    visualTheme === t.id
+                      ? `${t.grad} ${t.border} ${t.txt} shadow-sm`
+                      : "border-transparent text-white/20 hover:text-white/40"
+                  }`}>
+                  {visualTheme === t.id && <span className={`w-1 h-1 rounded-full ${t.dot}`} />}
+                  {t.label}
+                </button>
+              ))}
+            </div>
+            <button onClick={() => { setAuthenticated(false); sessionStorage.removeItem("admin-authenticated") }}
+              className="w-full flex items-center justify-center gap-1.5 px-2 py-1.5 text-[10px] font-medium text-white/30 hover:text-rose-400 hover:bg-rose-500/8 rounded-lg transition-all">
+              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
+              </svg>
+              Sign Out
+            </button>
+          </div>
+        </aside>
+
+        {/* ====== Main Content Area ====== */}
+        <div className="flex-1 flex flex-col min-w-0 min-h-0 relative" style={{ isolation: 'isolate' }}>
+          {/* Top Bar */}
+          <header className="flex-shrink-0 flex items-center gap-3 px-4 lg:px-6 h-12 border-b border-white/[0.05] bg-white/[0.02] backdrop-blur-xl">
+            <button onClick={() => setSidebarOpen(true)} className="lg:hidden p-1.5 -ml-1 text-white/40 hover:text-white/70 rounded-lg hover:bg-white/[0.05] transition-all">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+              </svg>
+            </button>
+            <div className="min-w-0 flex-1">
           <div className="flex items-center gap-3 min-w-0">
             <div className="min-w-0">
-              <h1 className="text-base sm:text-lg font-semibold text-white truncate">{tabs.find(t => t.id === tab)?.label || "Dashboard"}</h1>
-              <p className="text-[11px] text-white/30 mt-0.5 truncate">
+              <h1 className="text-base sm:text-lg font-semibold text-white/95 tracking-tight truncate">{tabs.find(t => t.id === tab)?.label || "Dashboard"}</h1>
+              <p className="text-xs text-white/25 mt-0.5 truncate font-medium tracking-wide">
                 {tab === "dashboard" && "Store performance at a glance"}
                 {tab === "analytics" && "Traffic and engagement metrics"}
                 {tab === "orders" && "Manage customer orders"}
                 {tab === "customers" && "Customer insights and history"}
                 {tab === "products" && "Manage product catalog"}
                 {tab === "sections" && "Homepage section builder"}
+                {tab === "collections" && "Product collections (like Shopify)"}
                 {tab === "reviews" && "Customer reviews management"}
                 {tab === "revenue" && "Financial performance"}
                 {tab === "inventory" && "Stock and inventory tracking"}
@@ -383,45 +428,52 @@ export default function Admin() {
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-            <div className="hidden sm:flex items-center gap-1 p-0.5 bg-white/[0.06] rounded-lg">
-              {["premium", "latest", "custom"].map((t) => (
-                <button key={t} onClick={() => switchVisualTheme(t)}
-                  className={`px-2.5 py-1 text-[11px] font-medium rounded-md transition-all ${visualTheme === t ? "bg-white/[0.08] text-white" : "text-white/40 hover:text-white/60"}`}>{t.charAt(0).toUpperCase() + t.slice(1)}</button>
-              ))}
-            </div>
+          </div>
+          <div className="flex items-center gap-2 flex-shrink-0">
             {tab === "products" && (
-              <button onClick={handleAdd} className="px-4 py-2 bg-white/[0.08] text-white text-sm font-medium rounded-xl hover:bg-white/[0.12] transition-colors flex items-center gap-2">
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+              <button onClick={handleAdd} className="px-3.5 py-2 bg-gradient-to-r from-purple-500/15 to-orange-500/15 hover:from-purple-500/25 hover:to-orange-500/25 text-white text-xs sm:text-sm font-medium rounded-xl transition-all flex items-center gap-2 border border-white/[0.06]">
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
                 <span className="hidden sm:inline">Add Product</span>
               </button>
             )}
             {tab === "sections" && (
-              <button onClick={() => setShowAddSection(!showAddSection)} className="px-4 py-2 bg-white/[0.08] text-white text-sm font-medium rounded-xl hover:bg-white/[0.12] transition-colors flex items-center gap-2">
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+              <button onClick={() => setShowAddSection(!showAddSection)} className="px-3.5 py-2 bg-gradient-to-r from-purple-500/15 to-orange-500/15 hover:from-purple-500/25 hover:to-orange-500/25 text-white text-xs sm:text-sm font-medium rounded-xl transition-all flex items-center gap-2 border border-white/[0.06]">
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
                 <span className="hidden sm:inline">Add Section</span>
+              </button>
+            )}
+            {tab === "collections" && (
+              <button onClick={() => { setCollectionForm({ name: "", description: "", image: "", productIds: [] }); setEditingCollection(null); setShowCollectionForm(true) }} className="px-3.5 py-2 bg-gradient-to-r from-purple-500/15 to-orange-500/15 hover:from-purple-500/25 hover:to-orange-500/25 text-white text-xs sm:text-sm font-medium rounded-xl transition-all flex items-center gap-2 border border-white/[0.06]">
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+                <span className="hidden sm:inline">Add Collection</span>
               </button>
             )}
           </div>
         </header>
 
         {/* Content Area */}
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6">
-          <div className="max-w-7xl mx-auto space-y-6">
+        <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
+          <div className="max-w-7xl mx-auto space-y-6 lg:space-y-8">
 
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <Suspense fallback={<div className="flex items-center justify-center min-h-[400px]"><div className="w-8 h-8 border-2 border-purple-500/30 border-t-purple-400 rounded-full animate-spin" /></div>}>
+        {tab === "dashboard" && (
+          <>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
               {stats.map((stat, i) => (
-                <motion.div key={stat.label} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}
-                  className="relative group bg-white/[0.03] border border-white/[0.06] rounded-2xl p-5 overflow-hidden hover:border-white/[0.1] transition-all duration-300">
-                  <div className="absolute inset-0 bg-gradient-to-br from-purple-500/[0.02] to-orange-500/[0.02] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  <p className="text-[11px] text-white/40 font-medium uppercase tracking-[0.08em]">{stat.label}</p>
-                  <p className="text-2xl font-bold text-white mt-1.5 tabular-nums">{stat.value}</p>
+                <motion.div key={stat.label} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06, duration: 0.4 }}
+                  className="relative group bg-gradient-to-br from-white/[0.04] to-white/[0.01] border border-white/[0.06] rounded-2xl p-5 md:p-6 overflow-hidden hover:border-white/[0.1] transition-all duration-500">
+                  <div className="absolute inset-0 bg-gradient-to-br from-purple-500/[0.04] to-orange-500/[0.02] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-purple-500/5 rounded-full blur-3xl group-hover:bg-purple-500/10 transition-all duration-700" />
+                  <div className="relative z-[1]">
+                    <p className="text-xs text-white/35 font-semibold uppercase tracking-[0.1em]">{stat.label}</p>
+                    <p className="text-2xl md:text-3xl font-bold text-white mt-2 tabular-nums tracking-tight">{stat.value}</p>
+                  </div>
                 </motion.div>
               ))}
             </div>
-
-      <Suspense fallback={<div className="flex items-center justify-center min-h-[400px]"><div className="w-8 h-8 border-2 border-purple-500/30 border-t-purple-400 rounded-full animate-spin" /></div>}>
-        {tab === "dashboard" && <AdminDashboard />}
+            <AdminDashboard />
+          </>
+        )}
         {tab === "analytics" && <AdminAnalytics />}
         {tab === "customers" && <AdminCustomers />}
         {tab === "revenue" && <AdminRevenue />}
@@ -431,9 +483,12 @@ export default function Admin() {
       </Suspense>
 
       {tab === "products" && (
-        <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl overflow-hidden">
-          <div className="p-4 border-b border-white/[0.06] flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
-            <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search products..." className="w-full sm:w-80 px-4 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-xl text-sm text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-purple-500/30 transition-all" />
+        <div className="bg-gradient-to-br from-white/[0.04] to-white/[0.01] border border-white/[0.06] rounded-2xl overflow-hidden shadow-xl shadow-black/20">
+          <div className="p-4 md:p-5 border-b border-white/[0.05] flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between bg-white/[0.02]">
+            <div className="relative w-full sm:w-80">
+              <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" /></svg>
+              <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search products..." className="w-full pl-10 pr-4 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-xl text-sm text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/30 transition-all" />
+            </div>
             <CsvImport onImport={handleCsvProducts} label="Import Products" expectedHeaders={["title", "price", "category", "description", "stock", "images", "sizes", "colors"]} />
           </div>
           {/* Mobile: card layout */}
@@ -508,65 +563,65 @@ export default function Admin() {
       {tab === "orders" && (
         <>
           {selectedOrder && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm" onClick={() => setSelectedOrder(null)}>
-              <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
-                className="bg-white/[0.03] border border-white/[0.06] rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-                <div className="sticky top-0 bg-white/[0.04] border-b border-white/[0.06] px-6 py-4 flex items-center justify-between z-10">
-                  <h3 className="text-base font-semibold text-white">Order #{selectedOrder.id}</h3>
-                  <button onClick={() => setSelectedOrder(null)} className="p-1.5 text-white/40 hover:text-white/60 rounded-lg hover:bg-white/[0.05] transition-all"><svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg></button>
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md" onClick={() => setSelectedOrder(null)}>
+              <motion.div initial={{ opacity: 0, scale: 0.96, y: 10 }} animate={{ opacity: 1, scale: 1, y: 0 }} transition={{ duration: 0.25 }}
+                className="bg-gradient-to-br from-white/[0.04] to-white/[0.01] border border-white/[0.06] rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+                <div className="sticky top-0 bg-white/[0.04] backdrop-blur-2xl border-b border-white/[0.06] px-5 md:px-6 py-4 flex items-center justify-between z-10">
+                  <h3 className="text-sm md:text-base font-semibold text-white/90">Order <span className="font-mono text-white/50">#{selectedOrder.id}</span></h3>
+                  <button onClick={() => setSelectedOrder(null)} className="p-1.5 text-white/30 hover:text-white/60 rounded-lg hover:bg-white/[0.05] transition-all"><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg></button>
                 </div>
-                <div className="p-6 space-y-6">
+                <div className="p-5 md:p-6 space-y-5">
                   <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div><span className="text-white/40 text-xs">Date</span><p className="text-white font-medium">{selectedOrder.createdAt ? new Date(selectedOrder.createdAt).toLocaleString() : ""}</p></div>
-                    <div><span className="text-white/40 text-xs">Payment</span><p className="text-white font-medium capitalize">{selectedOrder.paymentMethod || "N/A"}</p></div>
-                    <div><span className="text-white/40 text-xs">Total</span><p className="text-white font-medium">₹{selectedOrder.total?.toLocaleString()}</p></div>
-                    <div><span className="text-white/40 text-xs">Status</span>
+                    <div className="space-y-0.5"><span className="text-white/30 text-[10px] uppercase tracking-wider font-medium">Date</span><p className="text-white font-medium">{selectedOrder.createdAt ? new Date(selectedOrder.createdAt).toLocaleString() : ""}</p></div>
+                    <div className="space-y-0.5"><span className="text-white/30 text-[10px] uppercase tracking-wider font-medium">Payment</span><p className="text-white font-medium capitalize">{selectedOrder.paymentMethod || "N/A"}</p></div>
+                    <div className="space-y-0.5"><span className="text-white/30 text-[10px] uppercase tracking-wider font-medium">Total</span><p className="text-white font-medium tabular-nums">₹{selectedOrder.total?.toLocaleString()}</p></div>
+                    <div className="space-y-0.5"><span className="text-white/30 text-[10px] uppercase tracking-wider font-medium">Status</span>
                       <select value={selectedOrder.status} onChange={(e) => { const v = e.target.value; updateOrderStatus(selectedOrder.id, v); setSelectedOrder({ ...selectedOrder, status: v }) }}
-                        className="px-2 py-1 text-xs font-medium rounded-lg border border-white/[0.08] bg-transparent text-white focus:outline-none focus:ring-2 focus:ring-purple-500/30">
+                        className="w-full px-2 py-1 text-xs font-medium rounded-lg border border-white/[0.08] bg-white/[0.04] text-white focus:outline-none focus:ring-2 focus:ring-purple-500/20">
                         {statuses.map((s) => (<option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>))}
                       </select>
                     </div>
                   </div>
                   <div>
-                    <h4 className="text-xs font-semibold text-white/40 uppercase tracking-wider mb-2">Shipping Details</h4>
-                    <div className="bg-white/[0.02] rounded-xl p-4 text-sm space-y-1">
+                    <h4 className="text-[10px] font-semibold text-white/30 uppercase tracking-[0.12em] mb-2.5">Shipping Details</h4>
+                    <div className="bg-white/[0.03] rounded-xl p-4 text-sm space-y-1 border border-white/[0.04]">
                       <p className="text-white font-medium">{selectedOrder.customer?.fullName}</p>
-                      <p className="text-white/60">{selectedOrder.customer?.email}</p>
-                      <p className="text-white/60">{selectedOrder.customer?.phone}</p>
-                      <p className="text-white/60">{selectedOrder.customer?.address}, {selectedOrder.customer?.city}, {selectedOrder.customer?.state} - {selectedOrder.customer?.pincode}</p>
+                      <p className="text-white/50">{selectedOrder.customer?.email}</p>
+                      <p className="text-white/50">{selectedOrder.customer?.phone}</p>
+                      <p className="text-white/50">{selectedOrder.customer?.address}, {selectedOrder.customer?.city}, {selectedOrder.customer?.state} - {selectedOrder.customer?.pincode}</p>
                     </div>
                   </div>
                   <div>
-                    <h4 className="text-xs font-semibold text-white/40 uppercase tracking-wider mb-2">Items ({selectedOrder.items?.length || 0})</h4>
+                    <h4 className="text-[10px] font-semibold text-white/30 uppercase tracking-[0.12em] mb-2.5">Items ({selectedOrder.items?.length || 0})</h4>
                     <div className="space-y-2">
                       {selectedOrder.items?.map((item, i) => (
-                        <div key={i} className="flex items-center gap-3 p-3 bg-white/[0.02] rounded-xl">
-                          {item.images?.[0] && <img src={item.images[0]} alt="" className="w-12 h-12 rounded-lg object-cover bg-white/[0.06] flex-shrink-0" />}
+                        <div key={i} className="flex items-center gap-3 p-3 bg-white/[0.03] rounded-xl border border-white/[0.04]">
+                          {item.images?.[0] && <img src={item.images[0]} alt="" className="w-11 h-11 rounded-lg object-cover bg-white/[0.06] flex-shrink-0 ring-1 ring-white/[0.06]" />}
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-white truncate">{item.title}</p>
+                            <p className="text-sm font-medium text-white/90 truncate">{item.title}</p>
                             <p className="text-xs text-white/40">{item.quantity || 1} × ₹{item.price?.toLocaleString()}{item.size ? ` | ${item.size}` : ""}{item.color ? ` | ${item.color}` : ""}</p>
                           </div>
-                          <p className="text-sm font-medium text-white">₹{((item.quantity || 1) * item.price).toLocaleString()}</p>
+                          <p className="text-sm font-medium text-white/90 tabular-nums">₹{((item.quantity || 1) * item.price).toLocaleString()}</p>
                         </div>
                       ))}
                     </div>
                   </div>
                   <div className="border-t border-white/[0.06] pt-4">
-                    <h4 className="text-xs font-semibold text-white/40 uppercase tracking-wider mb-2">Order Notes</h4>
+                    <h4 className="text-[10px] font-semibold text-white/30 uppercase tracking-[0.12em] mb-2.5">Order Notes</h4>
                     <textarea
                       defaultValue={selectedOrder.notes || ""}
                       onBlur={(e) => { updateOrder(selectedOrder.id, { notes: e.target.value }); setSelectedOrder({ ...selectedOrder, notes: e.target.value }) }}
-                      className="w-full px-3 py-2 rounded-xl border border-white/[0.08] bg-transparent text-sm text-white focus:outline-none focus:ring-2 focus:ring-purple-500/30 transition-all" rows={2} placeholder="Add internal notes..."
+                      className="w-full px-3 py-2 rounded-xl border border-white/[0.08] bg-white/[0.03] text-sm text-white/90 placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all" rows={2} placeholder="Add internal notes..."
                     />
                   </div>
                   <div className="flex gap-2">
-                    <button onClick={() => setSelectedOrder(null)} className="px-4 py-2 border border-white/[0.08] text-white/60 text-sm font-medium rounded-xl hover:bg-white/[0.05] transition-colors">Close</button>
+                    <button onClick={() => setSelectedOrder(null)} className="px-4 py-2 border border-white/[0.08] text-white/50 text-sm font-medium rounded-xl hover:bg-white/[0.05] transition-all">Close</button>
                   </div>
                 </div>
               </motion.div>
             </div>
           )}
-          <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl overflow-hidden">
+          <div className="bg-gradient-to-br from-white/[0.04] to-white/[0.01] border border-white/[0.06] rounded-2xl overflow-hidden shadow-xl shadow-black/20">
             {orders.length === 0 ? (
               <div className="py-16 text-center">
                 <svg className="w-12 h-12 mx-auto text-white/10 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" /></svg>
@@ -611,22 +666,22 @@ export default function Admin() {
       )}
 
       {tab === "enquiries" && (
-        <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl overflow-hidden">
+        <div className="bg-gradient-to-br from-white/[0.04] to-white/[0.01] border border-white/[0.06] rounded-2xl overflow-hidden shadow-xl shadow-black/20">
           {editingEnquiry && (
-            <div className="border-b border-white/[0.06] p-5 bg-white/[0.02]">
+            <div className="border-b border-white/[0.06] p-5 bg-white/[0.03]">
               <div className="flex items-center justify-between mb-3">
-                <h4 className="text-sm font-semibold text-white">Edit Enquiry</h4>
-                <button onClick={() => setEditingEnquiry(null)} className="p-1 text-white/40 hover:text-white/60 rounded-lg hover:bg-white/[0.05] transition-all"><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg></button>
+                <h4 className="text-sm font-semibold text-white/90">Edit Enquiry</h4>
+                <button onClick={() => setEditingEnquiry(null)} className="p-1 text-white/30 hover:text-white/60 rounded-lg hover:bg-white/[0.05] transition-all"><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg></button>
               </div>
               <div className="space-y-3 max-w-lg">
-                <div><label className="block text-xs font-medium text-white/70 mb-1">Name</label><input value={editingEnquiry.name} onChange={(e) => setEditingEnquiry({ ...editingEnquiry, name: e.target.value })} className="w-full px-3 py-2 rounded-xl border border-white/[0.08] bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/30 transition-all" /></div>
-                <div><label className="block text-xs font-medium text-white/70 mb-1">Email</label><input value={editingEnquiry.email} onChange={(e) => setEditingEnquiry({ ...editingEnquiry, email: e.target.value })} className="w-full px-3 py-2 rounded-xl border border-white/[0.08] bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/30 transition-all" /></div>
-                <div><label className="block text-xs font-medium text-white/70 mb-1">Subject</label><input value={editingEnquiry.subject || ""} onChange={(e) => setEditingEnquiry({ ...editingEnquiry, subject: e.target.value })} className="w-full px-3 py-2 rounded-xl border border-white/[0.08] bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/30 transition-all" /></div>
-                <div><label className="block text-xs font-medium text-white/70 mb-1">Message</label><textarea value={editingEnquiry.message || ""} onChange={(e) => setEditingEnquiry({ ...editingEnquiry, message: e.target.value })} className="w-full px-3 py-2 rounded-xl border border-white/[0.08] bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/30 transition-all" rows={3} /></div>
+                <div><label className="block text-xs font-medium text-white/50 mb-1">Name</label><input value={editingEnquiry.name} onChange={(e) => setEditingEnquiry({ ...editingEnquiry, name: e.target.value })} className="w-full px-3 py-2 rounded-xl border border-white/[0.08] bg-white/[0.04] text-sm text-white/90 placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all" /></div>
+                <div><label className="block text-xs font-medium text-white/50 mb-1">Email</label><input value={editingEnquiry.email} onChange={(e) => setEditingEnquiry({ ...editingEnquiry, email: e.target.value })} className="w-full px-3 py-2 rounded-xl border border-white/[0.08] bg-white/[0.04] text-sm text-white/90 placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all" /></div>
+                <div><label className="block text-xs font-medium text-white/50 mb-1">Subject</label><input value={editingEnquiry.subject || ""} onChange={(e) => setEditingEnquiry({ ...editingEnquiry, subject: e.target.value })} className="w-full px-3 py-2 rounded-xl border border-white/[0.08] bg-white/[0.04] text-sm text-white/90 placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all" /></div>
+                <div><label className="block text-xs font-medium text-white/50 mb-1">Message</label><textarea value={editingEnquiry.message || ""} onChange={(e) => setEditingEnquiry({ ...editingEnquiry, message: e.target.value })} className="w-full px-3 py-2 rounded-xl border border-white/[0.08] bg-white/[0.04] text-sm text-white/90 placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all" rows={3} /></div>
                 <div className="flex gap-2">
-                  <button onClick={() => setEditingEnquiry(null)} className="px-3 py-1.5 border border-white/[0.08] text-white/60 text-xs font-medium rounded-xl hover:bg-white/[0.05] transition-colors">Cancel</button>
+                  <button onClick={() => setEditingEnquiry(null)} className="px-3 py-1.5 border border-white/[0.08] text-white/50 text-xs font-medium rounded-xl hover:bg-white/[0.05] transition-all">Cancel</button>
                   <button onClick={() => { editEnquiry(editingEnquiry.id, { name: editingEnquiry.name, email: editingEnquiry.email, subject: editingEnquiry.subject, message: editingEnquiry.message }); setEditingEnquiry(null) }}
-                    className="px-3 py-1.5 bg-white/[0.08] text-white text-xs font-medium rounded-xl hover:bg-white/[0.12] transition-colors">Save</button>
+                    className="px-3 py-1.5 bg-gradient-to-r from-purple-500/15 to-orange-500/15 text-white text-xs font-medium rounded-xl hover:from-purple-500/25 hover:to-orange-500/25 transition-all border border-white/[0.06]">Save</button>
                 </div>
               </div>
             </div>
@@ -637,16 +692,16 @@ export default function Admin() {
                 <p className="text-white/40 text-sm">No enquiries yet. Contact form submissions will appear here.</p>
               </div>
           ) : (
-            <div className="divide-y divide-neutral-100 dark:divide-neutral-800">
+            <div className="divide-y divide-white/[0.04]">
               {[...enquiries].reverse().map((e) => (
                 <div key={e.id} className="p-5 hover:bg-white/[0.03] transition-colors">
                   <div className="flex items-start justify-between gap-4 mb-3">
-                    <div><div className="flex items-center gap-3"><h4 className="text-sm font-semibold text-white">{e.name}</h4><span className={`px-2 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-wider ${e.replied ? "bg-emerald-500/10 text-emerald-400" : "bg-amber-50 dark:bg-amber-950/30 text-amber-400"}`}>{e.replied ? "Replied" : "New"}</span></div><p className="text-xs text-white/40 mt-0.5">{e.email}</p></div>
+                    <div><div className="flex items-center gap-3"><h4 className="text-sm font-semibold text-white">{e.name}</h4><span className={`px-2 py-0.5 rounded-full text-xs font-medium uppercase tracking-wider ${e.replied ? "bg-emerald-500/10 text-emerald-400" : "bg-amber-500/10 text-amber-400"}`}>{e.replied ? "Replied" : "New"}</span></div><p className="text-xs text-white/40 mt-0.5">{e.email}</p></div>
                     <div className="flex items-center gap-2 flex-shrink-0">
-                      <span className="text-[10px] text-white/40">{e.createdAt ? new Date(e.createdAt).toLocaleDateString() : ""}</span>
-                      <button onClick={() => setEditingEnquiry({ ...e })} className="p-1.5 text-white/40 hover:text-white/60 hover:bg-white/[0.05] rounded-lg transition-all" aria-label="Edit"><svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg></button>
+                      <span className="text-xs text-white/40">{e.createdAt ? new Date(e.createdAt).toLocaleDateString() : ""}</span>
+                      <button onClick={() => setEditingEnquiry({ ...e })} className="p-1.5 text-white/40 hover:text-purple-400 hover:bg-purple-500/10 rounded-lg transition-all" aria-label="Edit"><svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg></button>
                       <button onClick={() => { if (window.confirm(`Delete enquiry from ${e.name}?`)) deleteEnquiry(e.id) }} className="p-1.5 text-white/40 hover:text-red-500 hover:bg-rose-500/10 rounded-lg transition-all" aria-label="Delete"><svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg></button>
-                      {!e.replied && <button onClick={() => markEnquiryReplied(e.id)} className="px-3 py-1.5 text-xs font-medium text-white bg-neutral-900 dark:bg-white dark:text-white rounded-xl hover:bg-white/[0.12] transition-colors">Mark Replied</button>}
+                      {!e.replied && <button onClick={() => markEnquiryReplied(e.id)} className="px-3 py-1.5 text-xs font-medium text-emerald-400 bg-emerald-500/10 rounded-xl hover:bg-emerald-500/20 transition-all border border-emerald-500/20">Mark Replied</button>}
                     </div>
                   </div>
                   <p className="text-xs font-medium text-white/60 mb-1">{e.subject}</p>
@@ -658,10 +713,93 @@ export default function Admin() {
         </div>
       )}
 
+      {tab === "collections" && (
+        <div className="space-y-4">
+          {showCollectionForm && (
+            <div className="bg-gradient-to-br from-white/[0.04] to-white/[0.01] border border-white/[0.06] rounded-2xl p-5 shadow-xl shadow-black/20">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-sm font-semibold text-white">{editingCollection ? "Edit Collection" : "New Collection"}</h3>
+                <button onClick={() => { setShowCollectionForm(false); setCollectionForm({ name: "", description: "", image: "", productIds: [] }); setEditingCollection(null) }} className="p-1 text-white/30 hover:text-white/60 rounded-lg hover:bg-white/[0.05] transition-all"><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg></button>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+                <div>
+                  <label className="block text-xs font-medium text-white/70 mb-1">Collection Name</label>
+                  <input value={collectionForm.name} onChange={(e) => setCollectionForm({ ...collectionForm, name: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-white/[0.08] bg-white/[0.04] text-sm text-white/90 placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all" placeholder="Summer Essentials" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-white/70 mb-1">Image URL (optional)</label>
+                  <input value={collectionForm.image} onChange={(e) => setCollectionForm({ ...collectionForm, image: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-white/[0.08] bg-white/[0.04] text-sm text-white/90 placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all" placeholder="https://..." />
+                </div>
+              </div>
+              <div className="mb-4">
+                <label className="block text-xs font-medium text-white/70 mb-1">Description</label>
+                <textarea value={collectionForm.description} onChange={(e) => setCollectionForm({ ...collectionForm, description: e.target.value })}
+                  className="w-full px-3 py-2 rounded-xl border border-white/[0.08] bg-white/[0.04] text-sm text-white/90 placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all" rows={2} placeholder="Curated for the season..." />
+              </div>
+              <div className="mb-4">
+                <label className="block text-xs font-medium text-white/70 mb-1.5">Assign Products</label>
+                <div className="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto p-2 bg-white/[0.04] rounded-xl border border-white/[0.06]">
+                  {products.map((p) => (
+                    <button key={p.id} onClick={() => setCollectionForm((prev) => ({ ...prev, productIds: prev.productIds.includes(p.id) ? prev.productIds.filter((id) => id !== p.id) : [...prev.productIds, p.id] }))}
+                      className={`px-2.5 py-1 text-[10px] font-medium rounded-lg border transition-all ${collectionForm.productIds.includes(p.id) ? "bg-purple-500/15 text-white border-purple-500/30" : "border-white/[0.08] text-white/50 hover:text-white/70 hover:border-white/20"}`}>{p.title}</button>
+                  ))}
+                </div>
+                <p className="text-xs text-white/30 mt-1">{collectionForm.productIds.length} product{collectionForm.productIds.length !== 1 ? "s" : ""} selected</p>
+              </div>
+              <div className="flex gap-2">
+                <button onClick={() => { setShowCollectionForm(false); setCollectionForm({ name: "", description: "", image: "", productIds: [] }); setEditingCollection(null) }} className="px-3 py-1.5 border border-white/[0.08] text-white/50 text-xs font-medium rounded-xl hover:bg-white/[0.05] transition-all">Cancel</button>
+                <button onClick={() => {
+                  if (!collectionForm.name.trim()) { showToast("Collection name is required", "error"); return }
+                  const updated = editingCollection
+                    ? collections.map((c) => c.id === editingCollection.id ? { ...collectionForm, id: editingCollection.id } : c)
+                    : [...collections, { ...collectionForm, id: Date.now() }]
+                  setCollections(updated)
+                  localStorage.setItem("admin-collections", JSON.stringify(updated))
+                  setShowCollectionForm(false); setCollectionForm({ name: "", description: "", image: "", productIds: [] }); setEditingCollection(null)
+                  showToast(editingCollection ? "Collection updated" : "Collection created", "success")
+                }} className="px-3 py-1.5 bg-gradient-to-r from-purple-500/15 to-orange-500/15 text-white text-xs font-medium rounded-xl hover:from-purple-500/25 hover:to-orange-500/25 transition-all border border-white/[0.06]">{editingCollection ? "Update Collection" : "Create Collection"}</button>
+              </div>
+            </div>
+          )}
+          {collections.length === 0 && !showCollectionForm ? (
+            <div className="bg-gradient-to-br from-white/[0.04] to-white/[0.01] border border-white/[0.06] rounded-2xl py-16 text-center shadow-xl shadow-black/20">
+              <svg className="w-12 h-12 mx-auto text-white/10 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+              <p className="text-white/40 text-sm">No collections yet. Collections are like Shopify collections — groups of products you can feature on your store.</p>
+              <button onClick={() => setShowCollectionForm(true)} className="mt-4 px-4 py-2 bg-gradient-to-r from-purple-500/15 to-orange-500/15 text-white text-xs font-medium rounded-xl hover:from-purple-500/25 hover:to-orange-500/25 transition-all border border-white/[0.06]">Create Your First Collection</button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {collections.map((c) => (
+                <div key={c.id} className="bg-gradient-to-br from-white/[0.04] to-white/[0.01] border border-white/[0.06] rounded-2xl overflow-hidden shadow-xl shadow-black/20 group hover:border-white/[0.12] transition-all">
+                  {c.image && (
+                    <div className="h-28 overflow-hidden">
+                      <img src={c.image} alt={c.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    </div>
+                  )}
+                  <div className="p-4">
+                    <div className="flex items-start justify-between gap-2">
+                      <h3 className="text-sm font-semibold text-white truncate">{c.name}</h3>
+                      <span className="text-[10px] font-medium text-white/40 bg-white/[0.04] px-1.5 py-0.5 rounded-md flex-shrink-0">{c.productIds.length} items</span>
+                    </div>
+                    {c.description && <p className="text-xs text-white/40 mt-1 line-clamp-2">{c.description}</p>}
+                    <div className="flex items-center gap-1 mt-3 pt-3 border-t border-white/[0.04]">
+                      <button onClick={() => { setCollectionForm(c); setEditingCollection(c); setShowCollectionForm(true) }} className="flex-1 px-2 py-1.5 text-[10px] font-medium text-white/50 hover:text-white/70 hover:bg-white/[0.05] rounded-lg transition-all border border-white/[0.06]">Edit</button>
+                      <button onClick={() => { if (window.confirm(`Delete collection "${c.name}"?`)) { const updated = collections.filter((x) => x.id !== c.id); setCollections(updated); localStorage.setItem("admin-collections", JSON.stringify(updated)); showToast(`"${c.name}" deleted`, "info") } }} className="flex-1 px-2 py-1.5 text-[10px] font-medium text-rose-400 hover:bg-rose-500/10 rounded-lg transition-all border border-rose-500/20">Delete</button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
       {tab === "reviews" && (
-        <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl overflow-hidden">
-          <div className="p-4 border-b border-white/[0.06]">
-            <CsvImport onImport={handleCsvReviews} label="Import Reviews CSV" expectedHeaders={["productid", "name", "email", "rating", "text"]} />
+        <div className="bg-gradient-to-br from-white/[0.04] to-white/[0.01] border border-white/[0.06] rounded-2xl overflow-hidden shadow-xl shadow-black/20">
+          <div className="p-4 md:p-5 border-b border-white/[0.05] bg-white/[0.02]">
+            <CsvImport onImport={handleCsvReviews} label="Import Reviews" expectedHeaders={["productid", "name", "email", "rating", "text"]} />
           </div>
            {reviews.length === 0 ? (
               <div className="py-16 text-center">
@@ -685,15 +823,15 @@ export default function Admin() {
                       <tr key={r.id} className="border-b border-white/[0.04] last:border-0 hover:bg-white/[0.03] transition-colors group">
                       <td className="py-3 px-4"><span className="text-xs font-mono text-white/40 bg-white/[0.04] px-2 py-0.5 rounded-lg">#{r.productId}</span></td>
                       <td className="py-3 px-4"><div><p className="text-sm font-medium text-white">{r.name}</p><p className="text-xs text-white/40">{r.email}</p></div></td>
-                      <td className="py-3 px-4"><div className="flex items-center gap-0.5">{Array.from({ length: 5 }, (_, i) => <svg key={i} className={`w-3.5 h-3.5 ${i < r.rating ? "text-amber-400 fill-amber-400" : "text-neutral-300 dark:text-neutral-600 fill-neutral-300 dark:fill-neutral-600"}`} viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>)}</div></td>
+                      <td className="py-3 px-4"><div className="flex items-center gap-0.5">{Array.from({ length: 5 }, (_, i) => <svg key={i} className={`w-3.5 h-3.5 ${i < r.rating ? "text-amber-400 fill-amber-400" : "text-white/[0.12] fill-white/[0.12]"}`} viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>)}</div></td>
                       <td className="py-3 px-4 hidden sm:table-cell"><p className="text-xs text-white/60 truncate max-w-[200px]">{r.text}</p></td>
-                      <td className="py-3 px-4"><span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-wider ${r.approved ? "bg-emerald-500/10 text-emerald-400" : "bg-amber-50 dark:bg-amber-950/30 text-amber-400"}`}>{r.approved ? "Approved" : "Pending"}</span></td>
+                      <td className="py-3 px-4"><span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium uppercase tracking-wider ${r.approved ? "bg-emerald-500/10 text-emerald-400" : "bg-amber-500/10 text-amber-400"}`}>{r.approved ? "Approved" : "Pending"}</span></td>
                       <td className="py-3 px-4 text-xs text-white/40 hidden md:table-cell">{r.date || ""}</td>
-                      <td className="py-3 px-4 text-right"><div className="flex items-center justify-end gap-1">
-                        {!r.approved && <button onClick={() => approveReview(r.id)} className="px-2 py-1.5 text-[10px] font-medium text-white bg-green-600 rounded-lg hover:bg-green-500 transition-colors">Approve</button>}
-                        <button onClick={() => { const t = prompt("Edit review text:", r.text); if (t) updateReview(r.id, { text: t }); showToast("Review updated", "success") }} className="p-2 text-white/40 hover:text-white/60 hover:bg-white/[0.05] rounded-lg transition-all"><svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg></button>
+                      <td className="py-3 px-4 text-right">
+                        {!r.approved && <button onClick={() => approveReview(r.id)} className="px-2 py-1.5 text-xs font-medium text-emerald-400 bg-emerald-500/10 rounded-lg hover:bg-emerald-500/20 transition-all border border-emerald-500/20">Approve</button>}
+                        <button onClick={() => { const t = prompt("Edit review text:", r.text); if (t) updateReview(r.id, { text: t }); showToast("Review updated", "success") }} className="p-2 text-white/40 hover:text-purple-400 hover:bg-purple-500/10 rounded-lg transition-all"><svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg></button>
                         <button onClick={() => { deleteReview(r.id); showToast("Review deleted", "info") }} className="p-2 text-white/40 hover:text-red-500 hover:bg-rose-500/10 rounded-lg transition-all"><svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg></button>
-                      </div></td>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -704,41 +842,41 @@ export default function Admin() {
       )}
 
       {tab === "sections" && (
-        <div className="space-y-4">
+        <div className="space-y-4 md:space-y-5">
           {editingSlider && (
-            <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-5">
+            <div className="bg-gradient-to-br from-white/[0.04] to-white/[0.01] border border-white/[0.06] rounded-2xl p-5 shadow-xl shadow-black/20">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-semibold text-white">Configure Collection Slider</h3>
-                <button onClick={() => setEditingSlider(null)} className="p-1 text-white/40 hover:text-white/60 rounded-lg hover:bg-white/[0.05] transition-all"><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg></button>
+                <h3 className="text-sm font-semibold text-white/90">Configure Collection Slider</h3>
+                <button onClick={() => setEditingSlider(null)} className="p-1 text-white/30 hover:text-white/60 rounded-lg hover:bg-white/[0.05] transition-all"><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg></button>
               </div>
               <div className="mb-4">
-                <label className="block text-xs font-medium text-white/70 mb-1.5">Headline</label>
+                <label className="block text-xs font-medium text-white/50 mb-1.5">Headline</label>
                 <input value={sliderForm.headline} onChange={(e) => setSliderForm({ ...sliderForm, headline: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl border border-white/[0.08] bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/30 transition-all" placeholder="Shop the Look" />
+                  className="w-full px-3 py-2 rounded-xl border border-white/[0.08] bg-white/[0.04] text-sm text-white/90 placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all" placeholder="Shop the Look" />
               </div>
               <div>
-                <label className="block text-xs font-medium text-white/70 mb-1.5">Select Products</label>
-                <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto p-2 bg-white/[0.04] rounded-xl">
+                <label className="block text-xs font-medium text-white/50 mb-1.5">Select Products</label>
+                <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto p-2 bg-white/[0.04] rounded-xl border border-white/[0.06]">
                   {products.map((p) => (
                     <button key={p.id} onClick={() => setSliderForm((prev) => ({ ...prev, productIds: prev.productIds.includes(p.id) ? prev.productIds.filter((id) => id !== p.id) : [...prev.productIds, p.id] }))}
-                      className={`px-2.5 py-1 text-[10px] font-medium rounded-lg border transition-all ${sliderForm.productIds.includes(p.id) ? "bg-white/[0.08] text-white border-neutral-900" : "border-white/[0.08] text-white/60 hover:border-neutral-400"}`}>{p.title}</button>
+                      className={`px-2.5 py-1 text-[10px] font-medium rounded-lg border transition-all ${sliderForm.productIds.includes(p.id) ? "bg-purple-500/15 text-white border-purple-500/30" : "border-white/[0.08] text-white/50 hover:text-white/70 hover:border-white/20"}`}>{p.title}</button>
                   ))}
                 </div>
-                <p className="text-xs text-white/40 mt-1">{sliderForm.productIds.length} product{sliderForm.productIds.length !== 1 ? "s" : ""} selected (leave empty to show all)</p>
+                <p className="text-xs text-white/30 mt-1">{sliderForm.productIds.length} product{sliderForm.productIds.length !== 1 ? "s" : ""} selected</p>
               </div>
               <div className="flex gap-2 mt-4">
-                <button onClick={() => setEditingSlider(null)} className="px-3 py-1.5 border border-white/[0.08] text-white/60 text-xs font-medium rounded-xl hover:bg-white/[0.05] transition-colors">Cancel</button>
+                <button onClick={() => setEditingSlider(null)} className="px-3 py-1.5 border border-white/[0.08] text-white/50 text-xs font-medium rounded-xl hover:bg-white/[0.05] transition-all">Cancel</button>
                 <button onClick={() => {
                   if (!editingSlider) return
                   const updated = homeSections.map((s) => s.id === editingSlider.id ? { ...s, headline: sliderForm.headline, productIds: sliderForm.productIds } : s)
                   setHomeSections(updated); saveHomeSections(updated); setEditingSlider(null)
                   showToast("Collection slider updated", "success")
-                }} className="px-3 py-1.5 bg-white/[0.08] text-white text-xs font-medium rounded-xl hover:bg-white/[0.12] transition-colors">Save</button>
+                }} className="px-3 py-1.5 bg-gradient-to-r from-purple-500/15 to-orange-500/15 text-white text-xs font-medium rounded-xl hover:from-purple-500/25 hover:to-orange-500/25 transition-all border border-white/[0.06]">Save</button>
               </div>
             </div>
           )}
           {showAddSection && (
-            <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-5">
+            <div className="bg-gradient-to-br from-white/[0.04] to-white/[0.01] border border-white/[0.06] rounded-2xl p-5 shadow-xl shadow-black/20">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-sm font-semibold text-white">Add a Section</h3>
                 <button onClick={() => setShowAddSection(false)} className="p-1 text-white/40 hover:text-white/60 rounded-lg hover:bg-white/[0.05] transition-all" aria-label="Close"><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg></button>
@@ -758,7 +896,7 @@ export default function Admin() {
                         showToast(`"${t.label}" added`, "success")
                       }}
                       className={`px-3 py-2 text-xs font-medium rounded-xl border transition-all ${
-                        disabled ? "opacity-30 cursor-not-allowed border-white/[0.08] text-white/40" : "border-white/[0.08] text-white/70 hover:border-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-400"
+                        disabled ? "opacity-30 cursor-not-allowed border-white/[0.08] text-white/40" : "border-white/[0.08] text-white/60 hover:text-white/80 hover:border-white/20"
                       }`}>{t.label}</button>
                   )
                 })}
@@ -804,7 +942,7 @@ export default function Admin() {
             </div>
           )}
 
-          <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl divide-y divide-neutral-100 dark:divide-neutral-800">
+          <div className="bg-gradient-to-br from-white/[0.04] to-white/[0.01] border border-white/[0.06] rounded-2xl shadow-xl shadow-black/20 divide-y divide-white/[0.04]">
             {homeSections.map((sec, idx) => {
               const typeInfo = availableTypes.find((t) => t.id === sec.type)
               const isCustom = sec.type === "custom"
@@ -838,7 +976,7 @@ export default function Admin() {
                   )}
                   {sec.type === "collection-slider" && (
                     <button onClick={() => { setSliderForm({ headline: sec.headline || "Shop the Look", productIds: sec.productIds || [] }); setEditingSlider(sec) }}
-                      className="p-1.5 text-white/40 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all" aria-label="Configure">
+                      className="p-1.5 text-white/40 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all" aria-label="Configure">
                       <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.094c.55 0 1.02.398 1.11.94l.149.894c.07.424.395.764.82.854.527.112 1.016.314 1.46.596.213.136.456.173.686.1l.855-.27c.53-.167 1.1.056 1.33.555l.383.852c.23.5.03 1.1-.46 1.346l-.716.36c-.339.17-.543.543-.487.93.068.462.068.938 0 1.4-.056.387.148.76.487.93l.716.36c.49.246.69.847.46 1.346l-.383.852c-.23.5-.8.722-1.33.555l-.855-.27c-.23-.073-.473-.036-.686.1a4.2 4.2 0 01-1.46.596c-.425.09-.75.43-.82.854l-.149.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.02-.398-1.11-.94l-.149-.894c-.07-.424-.395-.764-.82-.854a4.2 4.2 0 01-1.46-.596c-.213-.136-.456-.173-.686-.1l-.855.27c-.53.168-1.1-.056-1.33-.555l-.383-.853c-.23-.5-.03-1.1.46-1.346l.716-.36c.339-.17.543-.543.487-.93a3.6 3.6 0 010-1.4c.056-.387-.148-.76-.487-.93l-.716-.36c-.49-.246-.69-.847-.46-1.346l.383-.852c.23-.5.8-.722 1.33-.555l.855.27c.23.073.473.036.686-.1a4.2 4.2 0 011.46-.596c.425-.09.75-.43.82-.854l.149-.894z" /><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                     </button>
                   )}
@@ -855,10 +993,10 @@ export default function Admin() {
             })}
           </div>
 
-          <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-5">
-            <h3 className="text-sm font-semibold text-white mb-3">Custom Sections</h3>
+          <div className="bg-gradient-to-br from-white/[0.04] to-white/[0.01] border border-white/[0.06] rounded-2xl p-5 shadow-xl shadow-black/20">
+            <h3 className="text-sm font-semibold text-white/90 mb-3">Custom Sections</h3>
             {sections.length === 0 ? (
-              <p className="text-xs text-white/40">No custom sections created yet. Click "Add Section" → "Custom Section" to create one.</p>
+              <p className="text-xs text-white/40">No custom sections created yet.</p>
             ) : (
               <div className="space-y-2">
                 {sections.map((sec) => (
@@ -882,106 +1020,57 @@ export default function Admin() {
       {tab === "theme" && (
         <div className="space-y-6">
           {/* Theme Manager */}
-          <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-6">
+          <div className="bg-gradient-to-br from-white/[0.04] to-white/[0.01] border border-white/[0.06] rounded-2xl p-5 md:p-6 shadow-xl shadow-black/20">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-base font-semibold text-white">Theme Manager</h2>
+              <h2 className="text-base font-semibold text-white/90">Theme Manager</h2>
               <button onClick={() => { setThemeForm(defaultThemeForm); setEditingTheme(null); setShowThemeForm(true) }}
-                className="px-4 py-2 bg-white/[0.08] text-white text-sm font-medium rounded-xl hover:bg-white/[0.12] transition-colors flex items-center gap-2">
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>Create Theme
+                className="px-3.5 py-2 bg-gradient-to-r from-purple-500/15 to-orange-500/15 hover:from-purple-500/25 hover:to-orange-500/25 text-white text-xs sm:text-sm font-medium rounded-xl transition-all flex items-center gap-2 border border-white/[0.06]">
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>Create Theme
               </button>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {/* Built-in themes */}
               {builtinThemeDefs.map((t) => {
                 const builtinActive = !activeCustomTheme && visualTheme === t.id.replace("-builtin", "")
                 return (
                 <div key={t.id} className={`relative p-4 rounded-xl border transition-all ${
                   builtinActive
-                    ? "border-amber-500 bg-amber-50/50 dark:bg-amber-950/20"
-                    : "border-white/[0.08] bg-white/[0.02] hover:border-amber-300 dark:hover:border-amber-700"
+                    ? "border-amber-500/40 bg-gradient-to-br from-amber-500/8 to-amber-500/3"
+                    : "border-white/[0.06] bg-white/[0.03] hover:border-white/20"
                 }`}>
                   <div className="flex items-start justify-between mb-2">
                     <div>
-                      <p className="text-sm font-semibold text-white">{t.name}</p>
-                      <p className="text-[10px] text-white/40 dark:text-white/40 font-mono mt-0.5">Built-in</p>
+                      <p className="text-sm font-semibold text-white/90">{t.name}</p>
+                      <p className="text-xs text-white/35 font-mono mt-0.5">Built-in</p>
                     </div>
-                    {builtinActive && (
-                      <span className="px-2 py-0.5 text-[10px] font-medium bg-amber-600 text-white rounded-full">Active</span>
-                    )}
-                  </div>
-                  <div className="flex gap-1.5 mb-3">
-                    <span className="w-5 h-5 rounded-full border border-white/20" style={{ background: `hsl(${t.accentH}, ${t.accentS}, ${t.accentL})` }} />
-                    <span className="w-5 h-5 rounded-full border border-white/20" style={{ background: t.bgDark }} />
-                    <span className="w-5 h-5 rounded-full border border-white/20" style={{ background: t.bgLight }} />
-                  </div>
-                  <div className="flex gap-1.5">
-                    <button onClick={() => { switchVisualTheme(t.id.replace("-builtin", "")); setActiveCustomTheme(""); localStorage.removeItem("admin-active-custom-theme") }}
-                      className={`flex-1 px-2 py-1 text-[10px] font-medium rounded-lg transition-all ${
+                    <div className="flex items-center gap-1.5">
+                      <span className="px-2 py-0.5 text-xs font-medium bg-amber-500/20 text-amber-400 rounded-full border border-amber-500/20">Active</span>
+                      {visualTheme !== "premium" && (
+                        <button onClick={() => switchVisualTheme("premium")}
+                          className={`flex-1 px-2 py-1 text-xs font-medium rounded-lg transition-all ${
                         builtinActive
-                          ? "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300"
-                          : "bg-white/[0.08] text-white hover:bg-white/[0.12]"
-                      }`}>{builtinActive ? "Active" : "Activate"}</button>
-                    <button onClick={() => {
-                      setThemeForm({
-                        name: `${t.name} (Custom)`, accentH: t.accentH, accentS: t.accentS, accentL: t.accentL,
-                        bgDark: t.bgDark, bgLight: t.bgLight, textDark: t.textDark, textLight: t.textLight,
-                        cardBg: t.cardBg, glassBg: t.glassBg, fontFamily: t.fontFamily, baseSize: t.baseSize,
-                        transitionDuration: t.transitionDuration, hoverLift: t.hoverLift, borderRadius: t.borderRadius,
-                      })
-                      setEditingTheme(null); setShowThemeForm(true)
-                    }} className="px-2 py-1 text-[10px] font-medium rounded-lg border border-white/[0.08] text-white/60 hover:bg-white/[0.05] transition-all">Edit</button>
-                  </div>
-                </div>
-              )})}
-              {/* Custom themes */}
-              {savedThemes.map((t) => (
-                <div key={t.id} className={`relative p-4 rounded-xl border transition-all ${
-                  activeCustomTheme === t.id
-                    ? "border-indigo-500 bg-indigo-50/50 dark:bg-indigo-950/20"
-                    : "border-white/[0.08] bg-white/[0.02] hover:border-indigo-300 dark:hover:border-indigo-700"
-                }`}>
-                  <div className="flex items-start justify-between mb-2">
-                    <div>
-                      <p className="text-sm font-semibold text-white">{t.name}</p>
-                      <p className="text-[10px] text-white/40 font-mono mt-0.5">ID: {t.id}</p>
+                          ? "bg-amber-500/15 text-amber-400"
+                          : "bg-white/[0.06] text-white/60 hover:bg-white/[0.1] hover:text-white/80"
+                      }`}>{builtinActive ? "Active" : "Activate"}</button>)}
+                      <button onClick={() => {
+                        setThemeForm({
+                          name: `${t.name} (Custom)`, accentH: t.accentH, accentS: t.accentS, accentL: t.accentL,
+                          bgDark: t.bgDark, bgLight: t.bgLight, textDark: t.textDark, textLight: t.textLight,
+                          cardBg: t.cardBg, glassBg: t.glassBg, fontFamily: t.fontFamily, baseSize: t.baseSize,
+                          transitionDuration: t.transitionDuration, hoverLift: t.hoverLift, borderRadius: t.borderRadius,
+                        })
+                        setEditingTheme(null); setShowThemeForm(true)
+                      }} className="px-2 py-1 text-xs font-medium rounded-lg border border-white/[0.06] text-white/40 hover:text-white/60 hover:bg-white/[0.05] transition-all">Edit</button>
                     </div>
-                    {activeCustomTheme === t.id && (
-                      <span className="px-2 py-0.5 text-[10px] font-medium bg-indigo-600 text-white rounded-full">Active</span>
-                    )}
-                  </div>
-                  <div className="flex gap-1.5 mb-3">
-                    <span className="w-5 h-5 rounded-full border border-white/20" style={{ background: `hsl(${t.accentH}, ${t.accentS}, ${t.accentL})` }} />
-                    <span className="w-5 h-5 rounded-full border border-white/20" style={{ background: t.bgDark }} />
-                    <span className="w-5 h-5 rounded-full border border-white/20" style={{ background: t.bgLight }} />
-                  </div>
-                  <div className="flex gap-1.5">
-                    <button onClick={() => { setActiveCustomTheme(t.id); localStorage.setItem("admin-active-custom-theme", t.id); showToast(`"${t.name}" activated`, "success") }}
-                      className={`flex-1 px-2 py-1 text-[10px] font-medium rounded-lg transition-all ${
-                        activeCustomTheme === t.id
-                          ? "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300"
-                          : "bg-white/[0.08] text-white hover:bg-white/[0.12]"
-                      }`}>{activeCustomTheme === t.id ? "Active" : "Activate"}</button>
-                    <button onClick={() => { setThemeForm(t); setEditingTheme(t); setShowThemeForm(true) }}
-                      className="px-2 py-1 text-[10px] font-medium rounded-lg border border-white/[0.08] text-white/60 hover:bg-white/[0.05] transition-all">Edit</button>
-                    <button onClick={() => {
-                      if (!window.confirm(`Delete theme "${t.name}"?`)) return
-                      const updated = savedThemes.filter((s) => s.id !== t.id)
-                      setSavedThemes(updated); localStorage.setItem("admin-custom-themes", JSON.stringify(updated))
-                      if (activeCustomTheme === t.id) { setActiveCustomTheme(""); localStorage.removeItem("admin-active-custom-theme") }
-                      showToast("Theme deleted", "info")
-                    }} className="px-2 py-1 text-[10px] font-medium rounded-lg border border-red-200 dark:border-red-800 text-red-500 hover:bg-rose-500/10 transition-all">Delete</button>
                   </div>
                 </div>
-              ))}
+              );
+              })}
             </div>
-            {savedThemes.length === 0 && (
-              <p className="mt-3 text-xs text-white/40">No custom themes yet. Click "Create Theme" to build one.</p>
-            )}
           </div>
-
+          
           {/* Theme Customizer Form */}
           {showThemeForm && (
-            <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-6">
+            <div className="bg-gradient-to-br from-white/[0.04] to-white/[0.01] border border-white/[0.06] rounded-2xl p-5 md:p-6 shadow-xl shadow-black/20">
               <div className="flex items-center justify-between mb-5">
                 <h2 className="text-base font-semibold text-white">{editingTheme ? "Edit Theme" : "Create New Theme"}</h2>
                 <button onClick={() => { setShowThemeForm(false); setThemeForm(defaultThemeForm); setEditingTheme(null) }}
@@ -1114,7 +1203,7 @@ export default function Admin() {
           )}
 
           {/* Social Media Links */}
-          <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-6">
+          <div className="bg-gradient-to-br from-white/[0.04] to-white/[0.01] border border-white/[0.06] rounded-2xl p-5 md:p-6 shadow-xl shadow-black/20">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-base font-semibold text-white">Social Media Links</h2>
               <button onClick={() => { setSocialForm({ platform: "", url: "", icon: "link" }); setEditingSocial(null); setShowSocialForm(true) }}
@@ -1177,12 +1266,12 @@ export default function Admin() {
               <div className="space-y-2">
                 {socialLinksConfig.map((link, idx) => (
                   <div key={link.id} className="flex items-center gap-3 p-3 bg-white/[0.02] rounded-xl">
-                    <span className="w-8 h-8 rounded-lg bg-white/[0.06] border border-neutral-200 dark:border-neutral-600 flex items-center justify-center text-white/40 text-xs uppercase font-bold flex-shrink-0">{link.platform.charAt(0)}</span>
+                    <span className="w-8 h-8 rounded-lg bg-white/[0.06] border border-white/[0.08] flex items-center justify-center text-white/40 text-xs uppercase font-bold flex-shrink-0">{link.platform.charAt(0)}</span>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-white">{link.platform}</p>
                       <p className="text-xs text-white/40 truncate">{link.url}</p>
                     </div>
-                    <span className="px-2 py-0.5 text-[10px] font-medium bg-white/[0.06] text-white/60 rounded-full capitalize">{link.icon}</span>
+                    <span className="px-2 py-0.5 text-xs font-medium bg-white/[0.06] text-white/60 rounded-full capitalize">{link.icon}</span>
                     <button onClick={() => { setSocialForm(link); setEditingSocial(link); setShowSocialForm(true) }}
                       className="p-1.5 text-white/40 hover:text-white/60 hover:bg-white/[0.05] rounded-lg transition-all"><svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg></button>
                     <button onClick={() => { if (window.confirm(`Delete "${link.platform}"?`)) { const updated = socialLinksConfig.filter((l) => l.id !== link.id); setSocialLinksConfig(updated); localStorage.setItem("admin-social-links", JSON.stringify(updated)); showToast("Link deleted", "info") } }}
@@ -1197,7 +1286,7 @@ export default function Admin() {
 
       {tab === "settings" && (
         <div className="space-y-6">
-          <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-6">
+          <div className="bg-gradient-to-br from-white/[0.04] to-white/[0.01] border border-white/[0.06] rounded-2xl p-5 md:p-6 shadow-xl shadow-black/20">
             <h2 className="text-base font-semibold text-white mb-4">Store Settings</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg">
               {[
@@ -1217,7 +1306,7 @@ export default function Admin() {
             </div>
           </div>
 
-          <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-6">
+          <div className="bg-gradient-to-br from-white/[0.04] to-white/[0.01] border border-white/[0.06] rounded-2xl p-5 md:p-6 shadow-xl shadow-black/20">
             <h2 className="text-base font-semibold text-white mb-4">Store Logo</h2>
             <div className="max-w-lg space-y-3">
               {storeLogo && (
@@ -1236,7 +1325,7 @@ export default function Admin() {
             </div>
           </div>
 
-          <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-6">
+          <div className="bg-gradient-to-br from-white/[0.04] to-white/[0.01] border border-white/[0.06] rounded-2xl p-5 md:p-6 shadow-xl shadow-black/20">
             <h2 className="text-base font-semibold text-white mb-4">Navigation Links</h2>
             <p className="text-xs text-white/40 mb-4">Manage the links shown in the navigation bar. The first link will be treated as the home page.</p>
             {showNavLinkForm && (
@@ -1296,13 +1385,13 @@ export default function Admin() {
               </div>
             )}
             {!showNavLinkForm && (
-              <button onClick={() => setShowNavLinkForm(true)} className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:bg-indigo-500/10 rounded-xl transition-colors border border-indigo-500/20">
+              <button onClick={() => setShowNavLinkForm(true)} className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-indigo-400 hover:bg-indigo-500/10 rounded-xl transition-colors border border-indigo-500/20">
                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>Add Link
               </button>
             )}
           </div>
 
-          <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-6">
+          <div className="bg-gradient-to-br from-white/[0.04] to-white/[0.01] border border-white/[0.06] rounded-2xl p-5 md:p-6 shadow-xl shadow-black/20">
             <h2 className="text-base font-semibold text-white mb-4">Announcement Bar</h2>
             <div className="max-w-lg">
               <label className="block text-xs font-medium text-white/70 mb-1">Announcement Text</label>
@@ -1313,7 +1402,7 @@ export default function Admin() {
             </div>
           </div>
 
-          <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-6">
+          <div className="bg-gradient-to-br from-white/[0.04] to-white/[0.01] border border-white/[0.06] rounded-2xl p-5 md:p-6 shadow-xl shadow-black/20">
             <h2 className="text-base font-semibold text-white mb-4">Maintenance Mode</h2>
             <div className="flex items-center justify-between max-w-lg">
               <div>
@@ -1327,7 +1416,7 @@ export default function Admin() {
             </div>
           </div>
 
-          <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-6">
+          <div className="bg-gradient-to-br from-white/[0.04] to-white/[0.01] border border-white/[0.06] rounded-2xl p-5 md:p-6 shadow-xl shadow-black/20">
             <h2 className="text-base font-semibold text-white mb-4">Meta Ads Connection</h2>
             <p className="text-xs text-white/40 mb-6">Connect Facebook and Instagram to track conversions and set up ad campaigns.</p>
             <div className="space-y-4 max-w-lg">
@@ -1344,7 +1433,7 @@ export default function Admin() {
             </div>
           </div>
 
-          <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-6">
+          <div className="bg-gradient-to-br from-white/[0.04] to-white/[0.01] border border-white/[0.06] rounded-2xl p-5 md:p-6 shadow-xl shadow-black/20">
             <h2 className="text-base font-semibold text-white mb-4">Danger Zone</h2>
             <div className="flex flex-wrap gap-3">
               <button onClick={() => { if (window.confirm("Reset all products to defaults? This cannot be undone.")) { resetProducts(); showToast("Products reset to defaults", "info") } }}
@@ -1363,6 +1452,7 @@ export default function Admin() {
       <ProductFormModal open={modalOpen} onClose={() => { setModalOpen(false); setEditingProduct(null) }} onSubmit={handleSubmit} product={editingProduct} />
       </div>
       </main>
+    </div>
     </div>
     </div>
   )

@@ -331,6 +331,23 @@ function TestimonialsSection({ visualTheme }) {
 
 function NewsletterSection({ visualTheme }) {
   const isLatest = visualTheme === "latest"
+  const [email, setEmail] = useState("")
+  const [justSubscribed, setJustSubscribed] = useState(false)
+
+  const handleSubscribe = (e) => {
+    e.preventDefault()
+    if (!email.trim()) return
+    const subscribers = JSON.parse(localStorage.getItem("admin-subscribers") || "[]")
+    if (subscribers.some((s) => s.email === email.trim())) {
+      showToast("This email is already subscribed!", "info")
+      return
+    }
+    subscribers.push({ email: email.trim(), subscribedAt: new Date().toISOString() })
+    localStorage.setItem("admin-subscribers", JSON.stringify(subscribers))
+    setEmail("")
+    setJustSubscribed(true)
+    showToast("Thank you for subscribing! 🎉", "success")
+  }
 
   return (
     <section className="relative overflow-hidden py-16 lg:py-20">
@@ -342,27 +359,46 @@ function NewsletterSection({ visualTheme }) {
             <span className="w-1 h-1 rounded-full bg-amber-400/80 dark:bg-amber-400/60" />
             Newsletter
           </div>
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-neutral-900 dark:text-white">Stay in the Loop</h2>
-          <p className="text-neutral-500 dark:text-white/35 mt-3 text-sm max-w-sm mx-auto">
-            Be the first to know about new arrivals and exclusive drops.
-          </p>
-          <form onSubmit={(e) => { e.preventDefault(); showToast("Subscribed successfully!", "success") }}
-            className="mt-6 max-w-sm mx-auto flex gap-2">
-            <input type="email" required placeholder="Enter your email"
-              className={`flex-1 px-4 py-3 rounded-xl bg-white/70 dark:bg-white/[0.04] border border-neutral-300/60 dark:border-white/[0.08] text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-white/20 text-sm focus:outline-none transition-all duration-300 ${
-                isLatest
-                  ? "focus:ring-2 focus:ring-cyan-400/20 focus:border-cyan-400/30"
-                  : "focus:ring-2 focus:ring-amber-400/20 focus:border-amber-400/30"
-              }`} />
-            <button type="submit"
-              className={`px-5 py-3 text-sm font-semibold rounded-xl transition-all duration-300 whitespace-nowrap ${
-                isLatest
-                  ? "bg-gradient-to-r from-cyan-500 to-blue-500 text-white"
-                  : "bg-gradient-to-r from-amber-600 to-orange-600 text-white"
-              } hover:scale-[1.02] active:scale-[0.98]`}>
-              Subscribe
-            </button>
-          </form>
+          {justSubscribed ? (
+            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}>
+              <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-neutral-900 dark:text-white">Thank You!</h2>
+              <p className="text-neutral-500 dark:text-white/35 mt-3 text-sm max-w-sm mx-auto">
+                You're now subscribed. Stay tuned for exclusive updates and drops.
+              </p>
+              <button onClick={() => setJustSubscribed(false)}
+                className={`mt-6 px-5 py-3 text-sm font-semibold rounded-xl transition-all duration-300 ${
+                  isLatest
+                    ? "bg-gradient-to-r from-cyan-500 to-blue-500 text-white"
+                    : "bg-gradient-to-r from-amber-600 to-orange-600 text-white"
+                } hover:scale-[1.02] active:scale-[0.98]`}>
+                Subscribe Another Email
+              </button>
+            </motion.div>
+          ) : (
+            <>
+              <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-neutral-900 dark:text-white">Stay in the Loop</h2>
+              <p className="text-neutral-500 dark:text-white/35 mt-3 text-sm max-w-sm mx-auto">
+                Be the first to know about new arrivals and exclusive drops.
+              </p>
+              <form onSubmit={handleSubscribe}
+                className="mt-6 max-w-sm mx-auto flex gap-2">
+                <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Enter your email"
+                  className={`flex-1 px-4 py-3 rounded-xl bg-white/70 dark:bg-white/[0.04] border border-neutral-300/60 dark:border-white/[0.08] text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-white/20 text-sm focus:outline-none transition-all duration-300 ${
+                    isLatest
+                      ? "focus:ring-2 focus:ring-cyan-400/20 focus:border-cyan-400/30"
+                      : "focus:ring-2 focus:ring-amber-400/20 focus:border-amber-400/30"
+                  }`} />
+                <button type="submit"
+                  className={`px-5 py-3 text-sm font-semibold rounded-xl transition-all duration-300 whitespace-nowrap ${
+                    isLatest
+                      ? "bg-gradient-to-r from-cyan-500 to-blue-500 text-white"
+                      : "bg-gradient-to-r from-amber-600 to-orange-600 text-white"
+                  } hover:scale-[1.02] active:scale-[0.98]`}>
+                  Subscribe
+                </button>
+              </form>
+            </>
+          )}
         </motion.div>
       </div>
     </section>

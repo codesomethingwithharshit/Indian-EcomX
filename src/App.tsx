@@ -68,10 +68,10 @@ export default function App() {
             <ReviewProvider>
           <div className="min-h-screen bg-white dark:bg-neutral-950 text-neutral-900 dark:text-white flex flex-col transition-colors duration-300">
             <div className="bg-grain fixed inset-0 z-0 pointer-events-none" />
-            <div className="relative z-10 flex flex-col min-h-screen">
+            <div className="relative z-10 flex-1 flex flex-col">
               <AnnouncementBar />
               <Navbar />
-              <main className="flex-1">
+              <main className="flex-1 flex flex-col">
                 <ErrorBoundary>
                   <ScrollToTop />
                   <Routes>

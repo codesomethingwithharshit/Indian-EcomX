@@ -35,7 +35,7 @@ const socialLinks = [
 const socialBtnClass = "flex items-center justify-center w-9 h-9 rounded-full border backdrop-blur-sm transition-all duration-300"
 
 export function Footer() {
-  const { visualTheme } = useTheme()
+  const { visualTheme, isDark } = useTheme()
   const isLatest = visualTheme === "latest"
 
   const adminSocialLinks = (() => {
@@ -69,7 +69,7 @@ export function Footer() {
                 </span>
               </Link>
               <p className={`mt-2 text-sm leading-relaxed max-w-sm ${
-                isLatest ? "text-white/30" : "text-neutral-500"
+                isLatest ? (isDark ? "text-white/30" : "text-neutral-500") : "text-white/40"
               }`}>
                 Elevating modern Indian streetwear through premium craftsmanship and futuristic design.
               </p>
@@ -83,8 +83,8 @@ export function Footer() {
                   to={link.to}
                   className={`relative text-sm transition-all duration-300 after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:transition-all after:duration-300 hover:after:w-full ${
                     isLatest
-                      ? "text-white/40 hover:text-white/70 after:bg-gradient-to-r after:from-cyan-400 after:to-blue-500"
-                      : "text-neutral-500/70 hover:text-amber-500/90 after:bg-gradient-to-r after:from-amber-500 after:to-orange-500"
+                      ? (isDark ? "text-white/40 hover:text-white/70" : "text-neutral-500/70 hover:text-neutral-900/80") + " after:bg-gradient-to-r after:from-cyan-400 after:to-blue-500"
+                      : "text-white/40 hover:text-amber-400/90 after:bg-gradient-to-r after:from-amber-500 after:to-orange-500"
                   }`}
                 >
                   {link.label}
@@ -95,22 +95,45 @@ export function Footer() {
 
           {/* Social Icons */}
           <div className="flex gap-2.5 mt-8 lg:mt-6">
-            {displaySocials.map((s) => (
-              <motion.a
-                key={s.label}
-                href={s.href}
-                whileHover={{ scale: 1.12 }}
-                whileTap={{ scale: 0.92 }}
-                className={`${socialBtnClass} ${
-                  isLatest
-                    ? "border-white/10 text-white/30 hover:text-cyan-300 hover:border-cyan-400/40 hover:shadow-lg hover:shadow-cyan-500/20"
-                    : "border-white/10 text-neutral-500/50 hover:text-amber-400 hover:border-amber-400/40 hover:shadow-lg hover:shadow-amber-500/20"
-                }`}
-                aria-label={s.label}
-              >
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">{s.icon}</svg>
-              </motion.a>
-            ))}
+            {displaySocials.map((s) => {
+              const label = s.label.toLowerCase()
+              const brandColor = {
+                instagram: "#e1306c",
+                twitter: "#1da1f2",
+                youtube: "#ff0000",
+                facebook: "#1877f2",
+                pinterest: "#e60023",
+                tiktok: "#00f2ea",
+                linkedin: "#0a66c2",
+                whatsapp: "#25d366",
+                telegram: "#0088cc",
+                discord: "#5865f2",
+                github: "#333",
+                dribbble: "#ea4c89",
+                behance: "#1769ff",
+                snapchat: "#fffc00",
+                threads: "#000000",
+              }[label]
+              return (
+                <motion.a
+                  key={s.label}
+                  href={s.href}
+                  whileHover={{ scale: 1.12 }}
+                  whileTap={{ scale: 0.92 }}
+                  className={`${socialBtnClass}`}
+                  style={{
+                    borderColor: brandColor ? `${brandColor}44` : "rgba(255,255,255,0.1)",
+                    color: brandColor ? brandColor : (isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.4)"),
+                    transition: "all 0.3s ease",
+                  }}
+                  onMouseEnter={(e) => { if (brandColor) { e.currentTarget.style.background = `${brandColor}18`; e.currentTarget.style.boxShadow = `0 0 24px ${brandColor}44`; e.currentTarget.style.borderColor = brandColor } }}
+                  onMouseLeave={(e) => { if (brandColor) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.boxShadow = "none"; e.currentTarget.style.borderColor = `${brandColor}44` } }}
+                  aria-label={s.label}
+                >
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">{s.icon}</svg>
+                </motion.a>
+              )
+            })}
           </div>
         </div>
 
@@ -120,20 +143,20 @@ export function Footer() {
         {/* Copyright + Terms */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 py-6">
           <p className={`text-[11px] tracking-[0.06em] ${
-            isLatest ? "text-white/15" : "text-neutral-500"
+            isLatest ? (isDark ? "text-white/15" : "text-neutral-400") : "text-white/20"
           }`}>
             &copy; 2026 URBAN EDGE. All rights reserved.
           </p>
           <div className="flex gap-5">
             <Link to="/terms" className={`text-[11px] tracking-[0.06em] transition-all duration-200 ${
               isLatest
-                ? "text-white/15 hover:text-white/40"
-                : "text-neutral-500 hover:text-amber-500/80"
+                ? (isDark ? "text-white/15 hover:text-white/40" : "text-neutral-400 hover:text-neutral-900/80")
+                : "text-white/20 hover:text-amber-400/80"
             }`}>Terms</Link>
             <Link to="/privacy" className={`text-[11px] tracking-[0.06em] transition-all duration-200 ${
               isLatest
-                ? "text-white/15 hover:text-white/40"
-                : "text-neutral-500 hover:text-amber-500/80"
+                ? (isDark ? "text-white/15 hover:text-white/40" : "text-neutral-400 hover:text-neutral-900/80")
+                : "text-white/20 hover:text-amber-400/80"
             }`}>Privacy</Link>
           </div>
         </div>
