@@ -25,7 +25,7 @@ export function ProductCard({ product, index = 0 }) {
       <Link to={`/products/${product.id}`} className="relative overflow-hidden bg-neutral-100 dark:bg-neutral-900">
         <div className={`absolute inset-0 bg-neutral-200 dark:bg-neutral-800 transition-opacity duration-500 ${imgLoaded ? "opacity-0" : "opacity-100"}`} />
         {imgError ? (
-          <div className="w-full h-56 sm:h-60 flex items-center justify-center bg-neutral-100 dark:bg-neutral-800">
+          <div className="w-full aspect-[4/5] sm:h-60 sm:aspect-auto flex items-center justify-center bg-neutral-100 dark:bg-neutral-800">
             <svg className="w-10 h-10 text-neutral-300 dark:text-neutral-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.41a2.25 2.25 0 013.182 0l2.909 2.91m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
             </svg>
@@ -36,7 +36,7 @@ export function ProductCard({ product, index = 0 }) {
             alt={product.title}
             onLoad={() => setImgLoaded(true)}
             onError={handleImgError}
-            className={`w-full h-56 sm:h-60 object-cover transition-all duration-700 ease-out ${imgLoaded ? "opacity-100 scale-100" : "opacity-0 scale-105"}`}
+            className={`w-full aspect-[4/5] sm:h-60 sm:aspect-auto object-cover transition-all duration-700 ease-out ${imgLoaded ? "opacity-100 scale-100" : "opacity-0 scale-105"}`}
             loading="lazy"
           />
         )}
@@ -78,7 +78,7 @@ export function ProductCard({ product, index = 0 }) {
           ₹{product.price.toLocaleString()}
         </span>
       </Link>
-      <div className="p-3 flex-1 flex flex-col gap-1.5">
+      <div className="p-3 sm:p-3 flex-1 flex flex-col gap-1.5">
         <div className="flex items-center gap-1.5">
           <span className={`text-[9px] font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider ${
             isLatest
@@ -109,7 +109,7 @@ export function ProductCard({ product, index = 0 }) {
           whileTap={{ scale: 0.95 }}
           onClick={() => addToCart(product)}
           disabled={product.stock === 0}
-          className={`w-full mt-auto py-2 text-[11px] font-semibold rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed ${
+          className={`w-full mt-auto py-2.5 sm:py-2 text-[11px] font-semibold rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed ${
             isLatest
               ? "bg-gradient-to-r from-cyan-500 to-blue-500 text-white hover:scale-[1.02]"
               : "bg-[oklch(55%_0.18_50)] text-white hover:scale-[1.02] active:scale-[0.98]"

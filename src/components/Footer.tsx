@@ -158,6 +158,11 @@ export function Footer() {
                 ? (isDark ? "text-white/15 hover:text-white/40" : "text-neutral-400 hover:text-neutral-900/80")
                 : "text-white/20 hover:text-amber-400/80"
             }`}>Privacy</Link>
+            <Link to="/contact" className={`text-[11px] tracking-[0.06em] transition-all duration-200 ${
+              isLatest
+                ? (isDark ? "text-white/15 hover:text-white/40" : "text-neutral-400 hover:text-neutral-900/80")
+                : "text-white/20 hover:text-amber-400/80"
+            }`}>Contact</Link>
           </div>
         </div>
       </div>

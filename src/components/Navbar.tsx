@@ -303,7 +303,7 @@ export function Navbar() {
                     Sign In
                   </Link>
                 )}
-                <Link
+                {/* <Link
                   to="/wishlist"
                   onClick={() => setMenuOpen(false)}
                   className={`block px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
@@ -313,6 +313,17 @@ export function Navbar() {
                   }`}
                 >
                   Wishlist ({wishlist.length})
+                </Link> */}
+                <Link
+                  to="/admin"
+                  onClick={() => setMenuOpen(false)}
+                  className={`block px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
+                    isLatest
+                      ? "text-white/50 hover:bg-white/5 hover:text-cyan-300"
+                      : "text-neutral-800 dark:text-neutral-200 hover:bg-amber-500/5 hover:text-amber-600 dark:hover:text-amber-400"
+                  }`}
+                >
+                  Admin 
                 </Link>
             </div>
           </motion.div>
